@@ -1,0 +1,16 @@
+I want to create this website for a company named - "Dev Agile"
+
+brief about the company - 
+DevAgile is group of software developers , we do impact full training bootcamps for people who are intrested in tech  , and we provide our services to companies to create custom softwares for them , have plans to create our own softwares in coming days 
+
+pages  - 
+
+Landing page - will have home , about us , collaboration (for tech events or hackathons) , Services (websites or andoroid applications , design , development , deployment) 
+
+nav elements on landing page - home , about us , collaboration , services these buttons will take to the dedicated sections on the landing page with smooth scroll effect , and one register button will be there in the navbar , the register button should be in different color  
+
+for now use the current brand color as defined in tailwind.config.js , and brand fonts too 
+for heading use - sharetech 
+for sub heading or description - use roboto , to add impact on some words use different fonts of roboto 
+
+
