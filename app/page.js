@@ -8,6 +8,7 @@ import ServicesSection from "../components/ServicesSection";
 import CollaborationSection from "../components/CollaborationSection";
 import Footer from "../components/Footer";
 import RegisterModal from "../components/RegisterModal";
+import ScrollReveal from "../components/ScrollReveal";
 
 export default function Home() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -22,18 +23,28 @@ export default function Home() {
       <Navbar onRegisterClick={handleOpenRegister} />
 
       {/* Main Sections */}
-      <main>
-        <HeroSection onRegisterClick={handleOpenRegister} />
+      <main className="overflow-hidden">
+        <ScrollReveal direction="none" delay={100}>
+          <HeroSection onRegisterClick={handleOpenRegister} />
+        </ScrollReveal>
         
-        <AboutSection />
+        <ScrollReveal direction="up" delay={200}>
+          <AboutSection />
+        </ScrollReveal>
         
-        <ServicesSection />
+        <ScrollReveal direction="up" delay={200}>
+          <ServicesSection />
+        </ScrollReveal>
         
-        <CollaborationSection />
+        <ScrollReveal direction="up" delay={200}>
+          <CollaborationSection />
+        </ScrollReveal>
       </main>
 
       {/* Footer */}
-      <Footer />
+      <ScrollReveal direction="up" delay={200}>
+        <Footer />
+      </ScrollReveal>
 
       {/* Popups & Modals */}
       <RegisterModal isOpen={isRegisterOpen} onClose={handleCloseRegister} />
