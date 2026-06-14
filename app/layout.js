@@ -40,6 +40,9 @@ const shareTech = localFont({
 export const metadata = {
   title: "DevAgile - Scale , Build , Grow",
   description: "Created by Adarsh Tiwari",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({ children }) {
