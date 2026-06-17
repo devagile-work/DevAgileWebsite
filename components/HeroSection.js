@@ -1,15 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import LogoSpinner from "./LogoSpinner";
 
 export default function HeroSection({ onRegisterClick }) {
-  const [showComingSoon, setShowComingSoon] = useState(false);
+  const router = useRouter();
+  const { data: session } = useSession();
 
   const handleRegisterClick = (e) => {
     if (e) e.preventDefault();
-    setShowComingSoon(true);
-    setTimeout(() => setShowComingSoon(false), 3000);
+    if (session) {
+      router.push("/dashboard");
+    } else {
+      router.push("/loginAndSignUp");
+    }
   };
 
   return (
@@ -102,12 +108,7 @@ export default function HeroSection({ onRegisterClick }) {
               >
                 Join our Bootcamp
               </button>
-              {showComingSoon && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-brand-navy text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg whitespace-nowrap animate-pulse">
-                  Coming Soon
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-brand-navy"></div>
-                </div>
-              )}
+              {/* showComingSoon removed */}
             </div>
             <a
               href="#services"

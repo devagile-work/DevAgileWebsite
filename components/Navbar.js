@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function Navbar({ onRegisterClick }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredIdx, setHoveredIdx] = useState(null);
   const [coords, setCoords] = useState({ left: 0, width: 0 });
-  const [showComingSoon, setShowComingSoon] = useState(false);
+  
+  const router = useRouter();
+  const { data: session } = useSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,8 +41,11 @@ export default function Navbar({ onRegisterClick }) {
 
   const handleRegisterClick = (e) => {
     if (e) e.preventDefault();
-    setShowComingSoon(true);
-    setTimeout(() => setShowComingSoon(false), 3000);
+    if (session) {
+      router.push("/dashboard");
+    } else {
+      router.push("/loginAndSignUp");
+    }
   };
 
   const navLinks = [
@@ -103,12 +110,6 @@ export default function Navbar({ onRegisterClick }) {
           >
             Register
           </button>
-          {showComingSoon && (
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-brand-navy text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded shadow-md whitespace-nowrap animate-pulse">
-              Coming Soon
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-brand-navy"></div>
-            </div>
-          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -172,12 +173,6 @@ export default function Navbar({ onRegisterClick }) {
             >
               Register
             </button>
-            {showComingSoon && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-brand-navy text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded shadow-md whitespace-nowrap animate-pulse">
-                Coming Soon
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-brand-navy"></div>
-              </div>
-            )}
           </div>
         </div>
       </div>
