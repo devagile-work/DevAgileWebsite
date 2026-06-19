@@ -80,7 +80,7 @@ export default function CoursePlanTabs({ tracks }) {
           <div className="inline-block bg-brand-green/10 text-brand-green border border-brand-green/20 px-3 py-1 rounded text-xs font-bold uppercase tracking-widest mb-3">
             {planData.duration} Journey
           </div>
-          <p className="text-xl text-brand-navy/80 font-medium max-w-2xl mx-auto">"{planData.crux}"</p>
+          <p className="text-xl text-brand-navy/80 font-medium max-w-2xl mx-auto">&quot;{planData.crux}&quot;</p>
         </div>
 
         {/* Timeline Flow Diagram */}
