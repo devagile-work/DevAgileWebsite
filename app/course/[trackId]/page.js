@@ -5,6 +5,7 @@ import Link from "next/link";
 import connectMongoDB from "../../../lib/mongodb";
 import Track from "../../../models/Track";
 import User from "../../../models/User";
+import Bootcamp from "../../../models/Bootcamp";
 import CoursePlayer from "../../../components/CoursePlayer";
 
 export default async function CourseStreamingPage({ params }) {
@@ -16,10 +17,11 @@ export default async function CourseStreamingPage({ params }) {
 
   await connectMongoDB();
 
-  // Parallel fetch Track details and User details
-  const [track, user] = await Promise.all([
+  // Parallel fetch Track details, User details, and parent Bootcamp
+  const [track, user, parentBootcamp] = await Promise.all([
     Track.findById(params.trackId).lean(),
-    User.findOne({ email: session.user.email }).lean()
+    User.findOne({ email: session.user.email }).lean(),
+    Bootcamp.findOne({ tracks: params.trackId }).lean()
   ]);
 
   if (!track) {
@@ -33,12 +35,36 @@ export default async function CourseStreamingPage({ params }) {
     );
   }
 
-  // Quick check if user owns the track OR if they own the parent bootcamp.
-  // Note: For simplicity, we just check if it's in purchasedTracks or if they bought the bootcamp bundle.
-  // We can query the bootcamp to see if it includes this track, or just trust the DB.
-  // For this placeholder, we'll assume basic authorization logic:
-  // If we reach here via the UI button, they have access.
+  // Check authorization
+  const hasPurchasedTrack = user?.purchasedTracks?.some(id => id.toString() === track._id.toString());
+  const hasPurchasedBootcamp = parentBootcamp && user?.purchasedBootcamps?.some(id => id.toString() === parentBootcamp._id.toString());
+
+  if (!hasPurchasedTrack && !hasPurchasedBootcamp) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
+        <div className="text-center bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+          <h1 className="text-2xl font-bold text-brand-navy mb-4 font-shareTech">Access Denied</h1>
+          <p className="text-gray-600 mb-6">You need to purchase this track or its bootcamp bundle to access the content.</p>
+          <Link href="/dashboard" className="bg-brand-navy text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-brand-navy/90 transition-colors font-shareTech">
+            Go to Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Determine WhatsApp Link based on track/bootcamp title
+  let whatsappLink = "";
+  const titleToCheck = `${track.title} ${parentBootcamp ? parentBootcamp.title : ""}`.toLowerCase();
   
+  if (titleToCheck.includes("web") || titleToCheck.includes("full stack")) {
+    whatsappLink = "https://chat.whatsapp.com/DiSj04OhGaF6mcT9Ma05fQ";
+  } else if (titleToCheck.includes("ai") || titleToCheck.includes("machine") || (titleToCheck.includes("data") && !titleToCheck.includes("structure"))) {
+    whatsappLink = "https://chat.whatsapp.com/DncMpZ9vHrt2aNzQmtPZfn";
+  } else if (titleToCheck.includes("dsa") || titleToCheck.includes("algorithm") || titleToCheck.includes("structure")) {
+    whatsappLink = "https://chat.whatsapp.com/JDNfPpBwbgL1yn1x9rTe5Z";
+  }
+
   return (
     <div className="min-h-screen bg-[#f8fafc] font-roboto pb-20 selection:bg-brand-green/30 selection:text-brand-navy">
       {/* Top Navbar */}
@@ -52,9 +78,9 @@ export default async function CourseStreamingPage({ params }) {
         </div>
       </nav>
 
-      {/* Main Course Content Placeholder */}
+      {/* Main Course Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
-        <CoursePlayer track={JSON.parse(JSON.stringify(track))} />
+        <CoursePlayer track={JSON.parse(JSON.stringify(track))} whatsappLink={whatsappLink} />
       </div>
     </div>
   );

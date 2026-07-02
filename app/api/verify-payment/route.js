@@ -4,6 +4,9 @@ import { authOptions } from "../auth/[...nextauth]/route";
 import connectMongoDB from "../../../lib/mongodb";
 import User from "../../../models/User";
 import Order from "../../../models/Order";
+import Bootcamp from "../../../models/Bootcamp";
+import Track from "../../../models/Track";
+import { sendWelcomeEmail } from "../../../lib/mailer";
 
 export async function POST(req) {
   try {
@@ -53,19 +56,32 @@ export async function POST(req) {
       const objectIdItemId = new mongoose.Types.ObjectId(itemId);
       
       let updateResult;
+      let courseName = "Your Course";
+
       if (itemType === "Bootcamp") {
         updateResult = await User.updateOne(
           { _id: user._id },
           { $addToSet: { purchasedBootcamps: objectIdItemId } }
         );
+        const bootcamp = await Bootcamp.findById(itemId);
+        if (bootcamp) courseName = bootcamp.title;
       } else if (itemType === "Track") {
         updateResult = await User.updateOne(
           { _id: user._id },
           { $addToSet: { purchasedTracks: objectIdItemId } }
         );
+        const track = await Track.findById(itemId);
+        if (track) courseName = track.title;
       }
       
       console.log("DB Update Result:", updateResult);
+      
+      // Send Welcome Email asynchronously
+      if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
+        sendWelcomeEmail(user.email, user.name, courseName).catch(console.error);
+      } else {
+        console.warn("Skipping welcome email: SMTP_EMAIL or SMTP_PASSWORD not configured.");
+      }
       
       // Force Next.js to invalidate the cache for the bootcamp routes so the UI updates
       const { revalidatePath } = require("next/cache");
