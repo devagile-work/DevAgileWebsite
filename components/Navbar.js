@@ -39,13 +39,12 @@ export default function Navbar({ onRegisterClick }) {
     setHoveredIdx(null);
   };
 
+  const [showComingSoon, setShowComingSoon] = useState(false);
+
   const handleRegisterClick = (e) => {
     if (e) e.preventDefault();
-    if (session) {
-      router.push("/dashboard");
-    } else {
-      router.push("/loginAndSignUp");
-    }
+    setShowComingSoon(true);
+    setTimeout(() => setShowComingSoon(false), 3000);
   };
 
   const navLinks = [
@@ -110,6 +109,12 @@ export default function Navbar({ onRegisterClick }) {
           >
             Register
           </button>
+          {showComingSoon && (
+            <div className="absolute top-12 -translate-x-1/2 bg-brand-green text-brand-navy text-sm py-1.5 px-3 rounded-lg shadow-lg whitespace-nowrap animate-bounce font-roboto font-bold z-50 pointer-events-none">
+              Coming Soon
+              <div className="absolute -top-2 left-1/2 -translate-x-1/2 border-4 border-transparent border-b-brand-green"></div>
+            </div>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -166,13 +171,19 @@ export default function Navbar({ onRegisterClick }) {
               {link.name}
             </a>
           ))}
-          <div className="relative w-full mt-4">
+          <div className="relative w-full mt-4 flex flex-col items-center">
             <button
               onClick={handleRegisterClick}
               className="w-full font-roboto text-sm font-bold bg-brand-navy text-white px-5 py-3 rounded-lg hover:bg-brand-green hover:text-brand-navy transition-all duration-300 text-center shadow-sm"
             >
               Register
             </button>
+            {showComingSoon && (
+              <div className="absolute -top-12 bg-brand-green text-brand-navy text-sm py-1.5 px-3 rounded-lg shadow-lg whitespace-nowrap animate-bounce font-roboto font-bold z-50 pointer-events-none">
+                Coming Soon
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-brand-green"></div>
+              </div>
+            )}
           </div>
         </div>
       </div>
