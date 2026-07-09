@@ -2,10 +2,9 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getTrackById, getInternshipByTrackId } from "../../../lib/internshipData";
 import connectMongoDB from "../../../lib/mongodb";
-import Track from "../../../models/Track";
 import User from "../../../models/User";
-import Bootcamp from "../../../models/Bootcamp";
 import CoursePlayer from "../../../components/CoursePlayer";
 
 export default async function CourseStreamingPage({ params }) {
@@ -17,11 +16,10 @@ export default async function CourseStreamingPage({ params }) {
 
   await connectMongoDB();
 
-  // Parallel fetch Track details, User details, and parent Bootcamp
   const [track, user, parentBootcamp] = await Promise.all([
-    Track.findById(params.trackId).lean(),
+    Promise.resolve(getTrackById(params.trackId)),
     User.findOne({ email: session.user.email }).lean(),
-    Bootcamp.findOne({ tracks: params.trackId }).lean()
+    Promise.resolve(getInternshipByTrackId(params.trackId))
   ]);
 
   if (!track) {

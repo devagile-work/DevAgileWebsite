@@ -3,8 +3,7 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import LogoutButton from "./LogoutButton";
 import Link from "next/link";
-import connectMongoDB from "../../lib/mongodb";
-import Bootcamp from "../../models/Bootcamp";
+import { INTERNSHIPS } from "../../lib/internshipData";
 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
@@ -13,8 +12,7 @@ export default async function Dashboard() {
     redirect("/loginAndSignUp");
   }
 
-  await connectMongoDB();
-  const bootcamps = await Bootcamp.find({}).lean();
+  const bootcamps = INTERNSHIPS;
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-brand-white font-roboto">
@@ -77,7 +75,7 @@ export default async function Dashboard() {
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="flex justify-between items-center mb-6 bg-brand-white/80 backdrop-blur-md p-4 lg:p-5 rounded-2xl border border-brand-white shadow-sm">
             <div>
-              <h1 className="text-2xl lg:text-3xl font-black text-brand-navy mb-0.5 tracking-tight font-shareTech uppercase">My Bootcamps</h1>
+              <h1 className="text-2xl lg:text-3xl font-black text-brand-navy mb-0.5 tracking-tight font-shareTech uppercase">My Internships</h1>
               <p className="text-brand-navy/70 font-medium text-xs lg:text-sm">Continue your learning journey</p>
             </div>
             <Link href="/" className="hover:scale-105 transition-transform">
@@ -113,7 +111,7 @@ export default async function Dashboard() {
                     </div>
 
                     <button className="w-full bg-brand-navy text-brand-white font-bold py-2.5 lg:py-3 rounded-xl hover:bg-brand-navy/90 transition-all shadow-sm hover:shadow-brand-navy/30 flex justify-center items-center gap-2 group-hover:bg-brand-green group-hover:shadow-brand-green/30 font-shareTech uppercase tracking-wide text-xs lg:text-sm pointer-events-none">
-                      <span>View Bootcamp Details</span>
+                      <span>View Internship Details</span>
                       <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>

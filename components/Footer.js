@@ -56,13 +56,13 @@ export default function Footer() {
               <li className="font-roboto text-xs font-light text-brand-navy/70">
                 mail:{" "}
                 <a href="mailto:hello@devagile.com" className="text-brand-green hover:underline font-normal">
-                  adarsh@devagile.work
+                  mail@devagile.work
                 </a>
               </li>
               <li className="font-roboto text-xs font-light text-brand-navy/70">
                 Phone:{" "}
                 <span href="mailto:bootcamps@devagile.com" className="text-brand-green hover:underline font-normal">
-                  +91 9817368861
+                  +91 8168365726
                 </span>
               </li>
               <li className="font-roboto text-xs font-light text-brand-navy/70">

@@ -2,9 +2,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getInternshipBySlug } from "../../../lib/internshipData";
 import connectMongoDB from "../../../lib/mongodb";
-import Bootcamp from "../../../models/Bootcamp";
-import Track from "../../../models/Track"; // needed to ensure Track is registered for populate
 import User from "../../../models/User"; // needed to check entitlements
 import RazorpayButton from "./RazorpayButton";
 import CoursePlanTabs from "./CoursePlanTabs";
@@ -18,12 +17,10 @@ export default async function BootcampPage({ params }) {
 
   await connectMongoDB();
   
-  // Parallel fetch for Bootcamp and User to save time
-  // We use the raw MongoDB collection for User to bypass any cached Mongoose schema issues during hot-reloading
   const mongoose = require('mongoose');
   
   const [bootcamp, user] = await Promise.all([
-    Bootcamp.findOne({ slug: params.slug }).populate('tracks').lean(),
+    Promise.resolve(getInternshipBySlug(params.slug)),
     mongoose.connection.db.collection('users').findOne({ email: session.user.email })
   ]);
 
@@ -31,7 +28,7 @@ export default async function BootcampPage({ params }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-brand-white">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-brand-navy mb-4 font-shareTech">404 - Bootcamp Not Found</h1>
+          <h1 className="text-4xl font-bold text-brand-navy mb-4 font-shareTech">404 - Internship Not Found</h1>
           <Link href="/dashboard" className="text-brand-green hover:underline font-bold">Return to Dashboard</Link>
         </div>
       </div>
@@ -79,7 +76,7 @@ export default async function BootcampPage({ params }) {
           <div className="flex-1 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 bg-brand-green/20 border border-brand-green/50 text-brand-green font-bold text-[10px] px-3 py-1.5 rounded-full mb-6 font-shareTech tracking-widest uppercase shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse"></span>
-              Full Bootcamp Bundle
+              Full Internship Bundle
             </div>
             <h1 className="text-4xl lg:text-6xl font-black text-brand-navy mb-6 font-shareTech leading-tight drop-shadow-sm">
               {bootcamp.title}
@@ -112,7 +109,7 @@ export default async function BootcampPage({ params }) {
                 <p className="text-gray-500 text-[10px] text-center mt-3 uppercase tracking-widest">Includes all {bootcamp.tracks.length} tracks</p>
                 {!hasPurchasedBootcamp && (
                   <a href="#individual-tracks" className="text-brand-navy hover:text-brand-green text-center text-xs font-bold uppercase tracking-wider mt-2 transition-colors">
-                    Or Buy Individual Courses at ₹{bootcamp.tracks[0]?.individualPrice || 799}
+                    Or Enroll in Individual Tracks at ₹{bootcamp.tracks[0]?.individualPrice || 499}
                   </a>
                 )}
               </div>
