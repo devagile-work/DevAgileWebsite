@@ -2,6 +2,60 @@
 
 import { useState } from "react";
 
+const ServicesForm = ({ setSuccess }) => {
+  const handleSubmit = (e) => {
+    const form = e.target;
+    setTimeout(() => {
+      setSuccess(true);
+      form.reset();
+    }, 1000);
+  };
+
+  return (
+    <form
+      action="https://docs.google.com/forms/d/e/1FAIpQLSdkLhlMeP9vDHV14W441ygPUm2NhIXyJXuFXIywDPPMnl8UrA/formResponse"
+      method="POST"
+      target="hidden_iframe"
+      onSubmit={handleSubmit}
+      className="space-y-2.5"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-[10px] font-bold font-shareTech tracking-wider uppercase text-brand-navy/75 mb-0.5">Name</label>
+          <input required type="text" name="entry.213925320" className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-brand-navy text-xs focus:outline-none focus:border-brand-navy transition-colors" placeholder="John Doe" />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold font-shareTech tracking-wider uppercase text-brand-navy/75 mb-0.5">Contact Email</label>
+          <input required type="email" name="entry.993404023" className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-brand-navy text-xs focus:outline-none focus:border-brand-navy transition-colors" placeholder="john@example.com" />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-[10px] font-bold font-shareTech tracking-wider uppercase text-brand-navy/75 mb-0.5">Contact Number</label>
+          <input required type="text" name="entry.1580135531" className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-brand-navy text-xs focus:outline-none focus:border-brand-navy transition-colors" placeholder="+1 234 567 8900" />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold font-shareTech tracking-wider uppercase text-brand-navy/75 mb-0.5">Service</label>
+          <select required name="entry.1665116935" className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-brand-navy text-xs focus:outline-none focus:border-brand-navy transition-colors">
+            <option value="Website Development">Website Development</option>
+            <option value="App Development">App Development</option>
+            <option value="UI/UX Design">UI/UX Design</option>
+            <option value="Custom Software">Custom Software</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label className="block text-[10px] font-bold font-shareTech tracking-wider uppercase text-brand-navy/75 mb-0.5">Project Details</label>
+        <textarea required name="entry.64802844" rows={2} className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-brand-navy text-xs focus:outline-none focus:border-brand-navy transition-colors resize-none h-16" placeholder="Tell us about your project..." />
+      </div>
+      <button type="submit" className="w-full font-roboto font-bold bg-brand-navy text-white py-2 rounded-md hover:bg-brand-green hover:text-brand-navy transition-all duration-300 hover:shadow-md text-xs mt-2">
+        Apply for Services
+      </button>
+    </form>
+  );
+};
+
 const InstructorForm = ({ setSuccess }) => {
   const handleSubmit = (e) => {
     const form = e.target;
@@ -176,10 +230,16 @@ const InternshipForm = ({ setSuccess }) => {
 };
 
 export default function CollaborationSection() {
-  const [activeForm, setActiveForm] = useState("instructor");
-  const [successState, setSuccessState] = useState({ instructor: false, sponsorship: false, internship: false });
+  const [activeForm, setActiveForm] = useState("services");
+  const [successState, setSuccessState] = useState({ services: false, instructor: false, sponsorship: false, internship: false });
 
   const getInvolvedTypes = [
+    {
+      id: "services",
+      title: "Apply for Services",
+      desc: "Looking to build a website, app, or custom software? Let our expert team bring your vision to life.",
+      Form: ServicesForm
+    },
     {
       id: "instructor",
       title: "Apply for Instructor",
@@ -248,6 +308,11 @@ export default function CollaborationSection() {
                         : "bg-brand-navy/5 border-brand-navy/15 text-brand-navy group-hover:bg-brand-navy/10"
                     }`}
                   >
+                    {option.id === "services" && (
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                      </svg>
+                    )}
                     {option.id === "instructor" && (
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
