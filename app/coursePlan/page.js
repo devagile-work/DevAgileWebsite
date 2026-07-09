@@ -6,6 +6,8 @@ import Footer from "../../components/Footer";
 import RegisterModal from "../../components/RegisterModal";
 import ScrollReveal from "../../components/ScrollReveal";
 
+// a simple comment
+
 export default function CoursePlan() {
   const [activeTab, setActiveTab] = useState("ai");
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
