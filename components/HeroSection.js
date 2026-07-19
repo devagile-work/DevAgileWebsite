@@ -12,8 +12,11 @@ export default function HeroSection({ onRegisterClick }) {
 
   const handleRegisterClick = (e) => {
     if (e) e.preventDefault();
-    setShowComingSoon(true);
-    setTimeout(() => setShowComingSoon(false), 3000);
+    if (session) {
+      router.push("/dashboard");
+    } else {
+      router.push("/loginAndSignUp");
+    }
   };
 
   return (
@@ -106,12 +109,6 @@ export default function HeroSection({ onRegisterClick }) {
               >
                 Join our Bootcamp
               </button>
-              {showComingSoon && (
-                <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-brand-navy text-white text-sm py-2 px-4 rounded-xl shadow-[0_4px_20px_rgba(3,48,87,0.25)] whitespace-nowrap animate-bounce font-roboto font-medium z-50 pointer-events-none">
-                  Coming Soon
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-brand-navy"></div>
-                </div>
-              )}
             </div>
             <a
               href="#services"
