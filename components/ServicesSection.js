@@ -1,7 +1,6 @@
 "use client";
 
 import ServicesGrid from "./services/ServicesGrid";
-import FeaturedProjects from "./services/FeaturedProjects";
 import ReviewsCarousel from "./services/ReviewsCarousel";
 
 export default function ServicesSection() {
@@ -27,7 +26,6 @@ export default function ServicesSection() {
         </div>
 
         <ServicesGrid />
-        <FeaturedProjects />
 
       </div>
     </section>
