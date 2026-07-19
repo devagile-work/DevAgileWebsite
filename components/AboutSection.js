@@ -53,7 +53,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section id="about" className="h-screen w-full flex flex-col justify-center bg-slate-50 relative overflow-hidden py-4 sm:py-8">
+    <section id="about" className="min-h-screen w-full flex flex-col justify-center bg-slate-50 relative overflow-hidden py-16 sm:py-24">
       {/* Injecting minimal custom animations for the floating tech elements */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }

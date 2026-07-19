@@ -54,10 +54,7 @@ export default function Home() {
         </ScrollReveal>
       </main>
 
-      {/* Footer */}
-      <ScrollReveal direction="up" delay={200}>
-        <Footer />
-      </ScrollReveal>
+      {/* Footer is now globally rendered in layout.js */}
 
       {/* Popups & Modals */}
       <RegisterModal isOpen={isRegisterOpen} onClose={handleCloseRegister} />

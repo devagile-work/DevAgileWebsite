@@ -5,7 +5,7 @@ import ReviewsCarousel from "./services/ReviewsCarousel";
 
 export default function ServicesSection() {
   return (
-    <section id="services" className="h-screen w-full flex flex-col justify-center bg-brand-white relative overflow-hidden py-4">
+    <section id="services" className="min-h-screen w-full flex flex-col justify-center bg-brand-white relative overflow-hidden py-16 sm:py-24">
       {/* Grid Pattern overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(3,48,87,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(3,48,87,0.01)_1px,transparent_1px)] bg-[size:30px_30px] z-0" />
       

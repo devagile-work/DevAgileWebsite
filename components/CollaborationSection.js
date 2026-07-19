@@ -268,7 +268,7 @@ export default function CollaborationSection() {
   };
 
   return (
-    <section id="collaboration" className="h-screen w-full flex flex-col justify-center bg-slate-50 relative overflow-hidden py-4">
+    <section id="collaboration" className="min-h-screen w-full flex flex-col justify-center bg-slate-50 relative overflow-hidden py-16 sm:py-24">
       {/* Background shape */}
       <div className="absolute top-[10%] left-[-15%] w-[450px] h-[450px] rounded-full bg-brand-green/10 blur-[120px] z-0 animate-pulse-glow" />
 

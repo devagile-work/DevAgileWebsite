@@ -45,12 +45,19 @@ export const metadata = {
   },
 };
 
+import Footer from "../components/Footer";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${inter.className} ${roboto.variable} ${shareTech.variable}`}>
         <AuthProvider>
-          {children}
+          <div className="flex flex-col min-h-screen">
+            <div className="flex-1">
+              {children}
+            </div>
+            <Footer />
+          </div>
         </AuthProvider>
       </body>
     </html>

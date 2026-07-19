@@ -22,42 +22,48 @@ export default async function Dashboard() {
   const bootcamps = await Bootcamp.find({}).lean();
 
   return (
-    <div className="flex flex-row min-h-screen bg-brand-white font-roboto">
+    <div className="flex flex-col md:flex-row min-h-screen bg-brand-white font-roboto">
       {/* Sidebar */}
-      <aside className="w-56 lg:w-64 bg-brand-white border-r border-brand-navy/10 flex flex-col p-4 lg:p-6 sticky top-0 h-screen overflow-y-auto z-20 shadow-[4px_0_24px_rgba(3,48,87,0.05)]">
+      <aside className="w-full md:w-56 lg:w-64 bg-brand-white border-b md:border-b-0 md:border-r border-brand-navy/10 flex flex-col p-4 lg:p-6 md:sticky top-0 md:h-screen z-20 shadow-sm md:shadow-[4px_0_24px_rgba(3,48,87,0.05)] shrink-0">
         {/* Profile Info */}
-        <div className="flex flex-col items-center justify-start mb-6 mt-2 gap-0">
-          <div className="flex flex-col items-center gap-0 w-full">
-            <div className="relative group cursor-pointer mb-3">
+        <div className="flex flex-row md:flex-col items-center justify-between md:justify-start mb-4 md:mb-6 mt-0 md:mt-2 gap-4 md:gap-0">
+          <div className="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full overflow-hidden">
+            <div className="relative group cursor-pointer md:mb-3 shrink-0">
                <div className="absolute inset-0 bg-brand-green rounded-full blur-md opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
               {session.user?.image ? (
-                 <img src={session.user.image} alt={session.user.name} className="w-16 h-16 rounded-full shadow-md object-cover relative z-10 border-2 border-brand-white" />
+                 <img src={session.user.image} alt={session.user.name} className="w-12 h-12 md:w-16 md:h-16 rounded-full shadow-md object-cover relative z-10 border-2 border-brand-white" />
               ) : (
-                <div className="w-16 h-16 rounded-full shadow-md bg-gradient-to-br from-brand-green/30 to-brand-green/10 flex items-center justify-center text-brand-navy text-2xl font-bold uppercase relative z-10 border-2 border-brand-white font-shareTech">
+                <div className="w-12 h-12 md:w-16 md:h-16 rounded-full shadow-md bg-gradient-to-br from-brand-green/30 to-brand-green/10 flex items-center justify-center text-brand-navy text-xl md:text-2xl font-bold uppercase relative z-10 border-2 border-brand-white font-shareTech">
                   {session.user?.name?.charAt(0) || "U"}
                 </div>
               )}
             </div>
-            <div className="text-center w-full">
-              <h2 className="text-base lg:text-lg font-bold text-brand-navy line-clamp-1 w-full px-1 font-shareTech">{session.user?.name}</h2>
-              <p className="text-xs text-brand-navy/60 line-clamp-1 w-full px-1 font-medium">{session.user?.email}</p>
+            <div className="text-left md:text-center min-w-0">
+              <h2 className="text-sm md:text-base lg:text-lg font-bold text-brand-navy truncate w-full md:px-1 font-shareTech">{session.user?.name}</h2>
+              <p className="text-[10px] md:text-xs text-brand-navy/60 truncate w-full md:px-1 font-medium">{session.user?.email}</p>
             </div>
+          </div>
+          
+          <div className="md:hidden shrink-0">
+             <LogoutButton className="flex justify-center items-center p-2 rounded-xl border border-brand-navy/20 text-brand-navy hover:bg-brand-navy hover:text-brand-white transition-all shadow-sm" />
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col space-y-2 overflow-visible pb-0">
-          <Link href="/dashboard" className="flex items-center gap-2 text-brand-navy bg-brand-green/20 border border-brand-green/30 px-3 py-2 lg:p-3 rounded-xl transition-all font-bold shadow-sm font-shareTech text-sm whitespace-nowrap">
-            <svg className="w-4 h-4 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <nav className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-1 md:pb-0 hide-scrollbar w-full">
+          <Link href="/dashboard" className="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-2 text-brand-navy bg-brand-green/20 border border-brand-green/30 px-3 py-2 lg:p-3 rounded-xl transition-all font-bold shadow-sm font-shareTech text-sm whitespace-nowrap">
+            <svg className="w-4 h-4 text-brand-green shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
             </svg>
             Dashboard
           </Link>
-          <SettingsButton hasPassword={hasPassword} />
+          <div className="flex-1 md:flex-none flex bg-slate-50 md:bg-transparent rounded-xl md:rounded-none border border-slate-100 md:border-none min-w-[110px]">
+            <SettingsButton hasPassword={hasPassword} />
+          </div>
         </nav>
 
-        {/* Logout */}
-        <div className="block mt-auto pt-4 border-t border-brand-navy/10">
+        {/* Logout Desktop */}
+        <div className="hidden md:block mt-auto pt-4 border-t border-brand-navy/10">
           <LogoutButton className="w-full flex justify-center items-center gap-2 border-2 border-brand-navy/20 text-brand-navy hover:bg-brand-navy hover:text-brand-white p-2.5 rounded-xl transition-all font-bold shadow-sm font-shareTech text-sm" />
         </div>
       </aside>

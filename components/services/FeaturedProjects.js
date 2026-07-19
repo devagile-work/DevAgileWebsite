@@ -1,6 +1,6 @@
 export default function FeaturedProjects() {
   return (
-    <section id="projects" className="h-screen w-full flex flex-col justify-center bg-slate-50 relative overflow-hidden py-4">
+    <section id="projects" className="min-h-screen w-full flex flex-col justify-center bg-slate-50 relative overflow-hidden py-16 sm:py-24">
       <div className="max-w-[100vw] mx-auto relative z-10 overflow-hidden w-full">
         <div className="text-center px-6 lg:px-8">
           <h3 className="font-shareTech text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-navy uppercase mb-8">
