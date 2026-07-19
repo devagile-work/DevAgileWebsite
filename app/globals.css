@@ -127,6 +127,32 @@ body {
   animation: pulse-glow 10s ease-in-out infinite;
 }
 
+@keyframes pillar-enter-left {
+  0% {
+    transform: translateX(-150vw) translateY(20vh);
+  }
+  100% {
+    transform: translateX(0) translateY(0);
+  }
+}
+
+@keyframes pillar-enter-right {
+  0% {
+    transform: translateX(150vw) translateY(-20vh);
+  }
+  100% {
+    transform: translateX(0) translateY(0);
+  }
+}
+
+.animate-pillar-left {
+  animation: pillar-enter-left 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-pillar-right {
+  animation: pillar-enter-right 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* Glassmorphism helpers for light theme */
 .glass-panel {
   background: rgba(255, 255, 255, 0.7);

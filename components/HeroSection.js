@@ -19,7 +19,7 @@ export default function HeroSection({ onRegisterClick }) {
   return (
     <section
       id="home"
-      className="relative min-h-screen pt-32 pb-20 flex flex-col items-center justify-center overflow-hidden bg-brand-white"
+      className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-brand-white pt-16"
     >
       {/* Background Gradients */}
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -77,7 +77,7 @@ export default function HeroSection({ onRegisterClick }) {
       </div>
 
       {/* Content Container (Centered) */}
-      <div className="max-w-4xl mx-auto px-6 lg:px-8 relative z-20 w-full flex flex-col items-center text-center">
+      <div className="max-w-4xl mx-auto px-10 md:px-16 lg:px-24 relative z-20 w-full flex flex-col items-center text-center">
         
         <div className="flex flex-col items-center">
           
@@ -86,11 +86,11 @@ export default function HeroSection({ onRegisterClick }) {
           <img
             src="/logos/completeLogo.png"
             alt="DevAgile Logo"
-            className="h-24 sm:h-24 md:h-40 w-auto "
+            className="h-16 sm:h-20 md:h-24 w-auto mb-4"
           />
 
           {/* Description */}
-          <p className="font-roboto font-light text-lg sm:text-xl text-brand-navy/85 max-w-2xl leading-relaxed mx-auto">
+          <p className="font-roboto font-light text-base sm:text-lg text-brand-navy/85 max-w-2xl leading-relaxed mx-auto">
             We are group of <span className="font-bold text-brand-navy">software developers</span>. 
             We launch high-impact <span className="font-bold text-brand-navy">training bootcamps</span> for tech aspirants 
             and build custom <span className="font-bold text-brand-navy">enterprise-grade software</span> for forward-thinking organizations, 

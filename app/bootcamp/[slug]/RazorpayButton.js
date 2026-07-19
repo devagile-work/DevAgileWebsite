@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function RazorpayButton({ amount, itemName, itemId, itemType, isBundle, compact, hasPurchased }) {
+export default function RazorpayButton({ amount, itemName, itemId, itemType, isBundle, compact, hasPurchased, firstTrackId }) {
   const [showModal, setShowModal] = useState(false);
   const [status, setStatus] = useState(null); // 'success' | 'failure' | null
   const [isLoading, setIsLoading] = useState(false);
@@ -15,9 +15,10 @@ export default function RazorpayButton({ amount, itemName, itemId, itemType, isB
 
   // If already purchased, render a Link to the course instead of the payment button
   if (effectivelyPurchased) {
+    const linkHref = isBundle && firstTrackId ? `/course/${firstTrackId}` : `/course/${itemId}`;
     return (
       <Link 
-        href={`/course/${itemId}`}
+        href={linkHref}
         className={`w-full font-bold transition-all shadow-sm flex justify-center items-center gap-2 font-shareTech uppercase tracking-wide ${
           compact ? 'py-2.5 px-3 text-xs rounded-lg' : 'py-3 lg:py-4 text-sm lg:text-base rounded-xl'
         } bg-brand-navy text-brand-white hover:bg-brand-navy/90 hover:shadow-brand-navy/30`}

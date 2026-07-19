@@ -58,8 +58,8 @@ export default function Navbar({ onRegisterClick }) {
     <nav
       className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/90 backdrop-blur-md border-b border-brand-navy/5 py-2 shadow-sm"
-          : "bg-transparent py-4"
+          ? "bg-white/90 backdrop-blur-md border-b border-brand-navy/5 py-1 shadow-sm"
+          : "bg-transparent py-2"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 lg:px-8 flex items-center justify-between">
@@ -71,7 +71,7 @@ export default function Navbar({ onRegisterClick }) {
             <img
               src="/logos/icon.png"
               alt="DevAgile Icon"
-              className="w-10 h-10 object-contain transition-transform duration-300"
+              className="w-7 h-7 md:w-8 md:h-8 object-contain transition-transform duration-300"
             />
           </a>
 

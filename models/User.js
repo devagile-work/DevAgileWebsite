@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema(
     },
     authProvider: {
       type: String,
-      enum: ["credentials", "google"],
+      enum: ["credentials", "google", "both"],
       default: "credentials",
     },
     purchasedBootcamps: [{

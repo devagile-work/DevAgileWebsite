@@ -268,33 +268,33 @@ export default function CollaborationSection() {
   };
 
   return (
-    <section id="collaboration" className="py-12 lg:py-16 bg-slate-50 relative overflow-hidden">
+    <section id="collaboration" className="h-screen w-full flex flex-col justify-center bg-slate-50 relative overflow-hidden py-4">
       {/* Background shape */}
       <div className="absolute top-[10%] left-[-15%] w-[450px] h-[450px] rounded-full bg-brand-green/10 blur-[120px] z-0 animate-pulse-glow" />
 
       {/* Hidden iframe for form submission without redirect */}
       <iframe name="hidden_iframe" id="hidden_iframe" className="hidden" title="hidden_iframe" style={{ display: "none" }}></iframe>
 
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-10 md:px-16 lg:px-24 relative z-10">
         {/* Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-8 space-y-3">
-          <h2 className="font-shareTech text-3xl sm:text-4xl font-extrabold tracking-tight text-brand-navy uppercase">
+        <div className="text-center max-w-3xl mx-auto mb-4 lg:mb-6 space-y-2">
+          <h2 className="font-shareTech text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-navy uppercase">
             Get Involved
           </h2>
           <div className="h-1 w-16 bg-brand-green mx-auto rounded-full" />
-          <p className="font-roboto font-light text-brand-navy/80 text-base leading-relaxed pt-1">
+          <p className="font-roboto font-light text-brand-navy/80 text-sm sm:text-base leading-relaxed pt-1">
             Whether you want to teach, partner up, or build with us, we have a place for you. Choose a track below to get started.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 items-stretch">
           {/* Left Side: Collaboration details */}
-          <div className="lg:col-span-5 space-y-3 flex flex-col">
+          <div className="md:col-span-5 space-y-2 flex flex-col">
             {getInvolvedTypes.map((option) => (
               <button
                 key={option.id}
                 onClick={() => setActiveForm(option.id)}
-                className={`text-left p-4 rounded-xl border transition-all duration-300 w-full group ${
+                className={`text-left p-3 lg:p-4 rounded-xl border transition-all duration-300 w-full group flex-1 flex flex-col justify-center ${
                   activeForm === option.id
                     ? "border-brand-navy bg-brand-navy shadow-lg"
                     : "border-slate-200 hover:border-brand-navy/30 bg-white hover:shadow-sm"
@@ -351,8 +351,8 @@ export default function CollaborationSection() {
           </div>
 
           {/* Right Side: Quick Contact form */}
-          <div className="lg:col-span-7 flex items-stretch">
-            <div className="w-full glass-panel p-5 rounded-xl border border-brand-navy/10 flex flex-col shadow-sm bg-white min-h-[300px]">
+          <div className="md:col-span-7 flex items-stretch h-full">
+            <div className="w-full glass-panel p-4 lg:p-5 rounded-xl border border-brand-navy/10 flex flex-col shadow-sm bg-white min-h-[300px] h-full overflow-y-auto hide-scrollbar">
               <div className="mb-4 border-b border-slate-100 pb-3">
                 <h3 className="font-shareTech text-lg font-bold text-brand-navy uppercase tracking-wide">
                   {activeFormObj.title}

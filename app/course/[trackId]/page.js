@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import connectMongoDB from "../../../lib/mongodb";
 import Track from "../../../models/Track";
-import User from "../../../models/User";
 import Bootcamp from "../../../models/Bootcamp";
+import User from "../../../models/User";
 import CoursePlayer from "../../../components/CoursePlayer";
 
 export default async function CourseStreamingPage({ params }) {
@@ -17,7 +17,6 @@ export default async function CourseStreamingPage({ params }) {
 
   await connectMongoDB();
 
-  // Parallel fetch Track details, User details, and parent Bootcamp
   const [track, user, parentBootcamp] = await Promise.all([
     Track.findById(params.trackId).lean(),
     User.findOne({ email: session.user.email }).lean(),

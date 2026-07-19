@@ -53,7 +53,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section id="about" className="py-16 bg-slate-50 relative overflow-hidden">
+    <section id="about" className="h-screen w-full flex flex-col justify-center bg-slate-50 relative overflow-hidden py-4 sm:py-8">
       {/* Injecting minimal custom animations for the floating tech elements */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
@@ -66,20 +66,20 @@ export default function AboutSection() {
       {/* Background shape */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-brand-green/5 blur-[120px] z-0 pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+      <div className="max-w-7xl mx-auto px-10 md:px-16 lg:px-24 relative z-10 flex flex-col md:flex-row gap-12 md:gap-20 items-center">
         
         {/* ======================================= */}
         {/* LEFT SIDE: COMPACT CONTENT              */}
         {/* ======================================= */}
-        <div className="w-full lg:w-7/12 space-y-12">
+        <div className="w-full md:w-7/12 space-y-12">
           
           {/* Header */}
           <div>
-            <h2 className="font-shareTech text-3xl sm:text-4xl font-extrabold tracking-tight text-brand-navy uppercase mb-3">
+            <h2 className="font-shareTech text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-navy uppercase mb-3">
               Who We Are
             </h2>
             <div className="h-1 w-16 bg-brand-green rounded-full mb-4" />
-            <p className="font-roboto font-light text-brand-navy/80 text-base leading-relaxed">
+            <p className="font-roboto font-light text-brand-navy/80 text-sm sm:text-base leading-relaxed">
               DevAgile is a dynamic group of software developers driving change through education 
               and modern technical craftsmanship.
             </p>
@@ -121,7 +121,7 @@ export default function AboutSection() {
         {/* ======================================= */}
         {/* RIGHT SIDE: ANIMATED TECH VISUAL        */}
         {/* ======================================= */}
-        <div className="w-full lg:w-5/12 h-[450px] relative hidden md:flex items-center justify-center">
+        <div className="w-full md:w-5/12 h-[250px] sm:h-[300px] lg:h-[400px] relative hidden md:flex items-center justify-center scale-90 lg:scale-100 origin-center">
           
           {/* Main Floating Terminal Window */}
           <div className="relative z-20 w-full max-w-sm bg-[#0A192F] rounded-lg shadow-2xl border border-brand-green/20 overflow-hidden anim-float">

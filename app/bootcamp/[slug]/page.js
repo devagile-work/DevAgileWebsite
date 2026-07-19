@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import connectMongoDB from "../../../lib/mongodb";
 import Bootcamp from "../../../models/Bootcamp";
-import Track from "../../../models/Track"; // needed to ensure Track is registered for populate
+import Track from "../../../models/Track";
 import User from "../../../models/User"; // needed to check entitlements
 import RazorpayButton from "./RazorpayButton";
 import CoursePlanTabs from "./CoursePlanTabs";
@@ -18,8 +18,6 @@ export default async function BootcampPage({ params }) {
 
   await connectMongoDB();
   
-  // Parallel fetch for Bootcamp and User to save time
-  // We use the raw MongoDB collection for User to bypass any cached Mongoose schema issues during hot-reloading
   const mongoose = require('mongoose');
   
   const [bootcamp, user] = await Promise.all([
@@ -108,11 +106,11 @@ export default async function BootcampPage({ params }) {
               </div>
               <div className="w-px h-20 bg-gray-200 hidden sm:block mx-4"></div>
               <div className="flex-1 w-full flex flex-col justify-center relative z-10">
-                <RazorpayButton amount={bootcamp.bundlePrice} itemName={`${bootcamp.title} (Full Bundle)`} itemId={bootcamp._id.toString()} itemType="Bootcamp" isBundle={true} compact={false} hasPurchased={hasPurchasedBootcamp} />
+                <RazorpayButton amount={bootcamp.bundlePrice} itemName={`${bootcamp.title} (Full Bundle)`} itemId={bootcamp._id.toString()} itemType="Bootcamp" isBundle={true} compact={false} hasPurchased={hasPurchasedBootcamp} firstTrackId={bootcamp.tracks[0]?._id?.toString()} />
                 <p className="text-gray-500 text-[10px] text-center mt-3 uppercase tracking-widest">Includes all {bootcamp.tracks.length} tracks</p>
                 {!hasPurchasedBootcamp && (
                   <a href="#individual-tracks" className="text-brand-navy hover:text-brand-green text-center text-xs font-bold uppercase tracking-wider mt-2 transition-colors">
-                    Or Buy Individual Courses at ₹{bootcamp.tracks[0]?.individualPrice || 799}
+                    Or Enroll in Individual Tracks at ₹{bootcamp.tracks[0]?.individualPrice || 499}
                   </a>
                 )}
               </div>

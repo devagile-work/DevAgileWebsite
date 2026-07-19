@@ -54,32 +54,32 @@ export default function ServicesGrid() {
 
   return (
     <div className="w-full pb-8 px-4 lg:px-8 max-w-[95rem] mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 w-full">
+      <div className="flex flex-nowrap justify-between gap-2 md:gap-3 w-full pb-2">
         {services.map((service, index) => (
           <div
             key={service.title}
-            className="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col justify-between shadow-sm bg-white"
+            className="glass-panel glass-panel-hover p-3 md:p-4 rounded-xl flex flex-col justify-between shadow-sm bg-white flex-1 min-w-0 shrink-1"
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="p-2.5 rounded-xl bg-brand-navy/5 border border-brand-navy/5">
-                  {service.icon}
+                <div className="p-1.5 md:p-2 rounded-lg bg-brand-navy/5 border border-brand-navy/5">
+                  <div className="scale-75 md:scale-90">{service.icon}</div>
                 </div>
-                <span className="font-shareTech text-[10px] sm:text-xs font-bold uppercase tracking-widest text-brand-navy/70">
+                <span className="font-shareTech text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-brand-navy/70 whitespace-nowrap ml-1">
                   {service.tag}
                 </span>
               </div>
               
-              <h3 className="font-shareTech text-lg sm:text-xl font-bold text-brand-navy tracking-wide">
+              <h3 className="font-shareTech text-sm md:text-base font-bold text-brand-navy tracking-tight leading-tight mt-2">
                 {service.title}
               </h3>
               
-              <p className="font-roboto font-light text-brand-navy/75 text-xs sm:text-sm leading-relaxed">
+              <p className="font-roboto font-light text-brand-navy/75 text-[10px] md:text-xs leading-tight line-clamp-4">
                 {service.desc}
               </p>
             </div>
 
-            <div className="border-t border-brand-navy/5 mt-6 pt-4 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-brand-navy font-shareTech">
+            <div className="border-t border-brand-navy/5 mt-3 md:mt-4 pt-2 md:pt-3 flex items-center justify-between text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-brand-navy font-shareTech">
               <span>Production Grade</span>
               <svg className="w-3 h-3 text-brand-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
