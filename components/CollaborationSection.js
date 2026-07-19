@@ -2,6 +2,60 @@
 
 import { useState } from "react";
 
+const ServicesForm = ({ setSuccess }) => {
+  const handleSubmit = (e) => {
+    const form = e.target;
+    setTimeout(() => {
+      setSuccess(true);
+      form.reset();
+    }, 1000);
+  };
+
+  return (
+    <form
+      action="https://docs.google.com/forms/d/e/1FAIpQLSdkLhlMeP9vDHV14W441ygPUm2NhIXyJXuFXIywDPPMnl8UrA/formResponse"
+      method="POST"
+      target="hidden_iframe"
+      onSubmit={handleSubmit}
+      className="space-y-2.5"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-[10px] font-bold font-shareTech tracking-wider uppercase text-brand-navy/75 mb-0.5">Name</label>
+          <input required type="text" name="entry.213925320" className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-brand-navy text-xs focus:outline-none focus:border-brand-navy transition-colors" placeholder="John Doe" />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold font-shareTech tracking-wider uppercase text-brand-navy/75 mb-0.5">Contact Email</label>
+          <input required type="email" name="entry.993404023" className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-brand-navy text-xs focus:outline-none focus:border-brand-navy transition-colors" placeholder="john@example.com" />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-[10px] font-bold font-shareTech tracking-wider uppercase text-brand-navy/75 mb-0.5">Contact Number</label>
+          <input required type="text" name="entry.1580135531" className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-brand-navy text-xs focus:outline-none focus:border-brand-navy transition-colors" placeholder="+1 234 567 8900" />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold font-shareTech tracking-wider uppercase text-brand-navy/75 mb-0.5">Service</label>
+          <select required name="entry.1665116935" className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-brand-navy text-xs focus:outline-none focus:border-brand-navy transition-colors">
+            <option value="Website Development">Website Development</option>
+            <option value="App Development">App Development</option>
+            <option value="UI/UX Design">UI/UX Design</option>
+            <option value="Custom Software">Custom Software</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label className="block text-[10px] font-bold font-shareTech tracking-wider uppercase text-brand-navy/75 mb-0.5">Project Details</label>
+        <textarea required name="entry.64802844" rows={2} className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-brand-navy text-xs focus:outline-none focus:border-brand-navy transition-colors resize-none h-16" placeholder="Tell us about your project..." />
+      </div>
+      <button type="submit" className="w-full font-roboto font-bold bg-brand-navy text-white py-2 rounded-md hover:bg-brand-green hover:text-brand-navy transition-all duration-300 hover:shadow-md text-xs mt-2">
+        Apply for Services
+      </button>
+    </form>
+  );
+};
+
 const InstructorForm = ({ setSuccess }) => {
   const handleSubmit = (e) => {
     const form = e.target;
@@ -176,10 +230,16 @@ const InternshipForm = ({ setSuccess }) => {
 };
 
 export default function CollaborationSection() {
-  const [activeForm, setActiveForm] = useState("instructor");
-  const [successState, setSuccessState] = useState({ instructor: false, sponsorship: false, internship: false });
+  const [activeForm, setActiveForm] = useState("services");
+  const [successState, setSuccessState] = useState({ services: false, instructor: false, sponsorship: false, internship: false });
 
   const getInvolvedTypes = [
+    {
+      id: "services",
+      title: "Apply for Services",
+      desc: "Looking to build a website, app, or custom software? Let our expert team bring your vision to life.",
+      Form: ServicesForm
+    },
     {
       id: "instructor",
       title: "Apply for Instructor",
@@ -208,33 +268,33 @@ export default function CollaborationSection() {
   };
 
   return (
-    <section id="collaboration" className="py-12 lg:py-16 bg-slate-50 relative overflow-hidden">
+    <section id="collaboration" className="h-screen w-full flex flex-col justify-center bg-slate-50 relative overflow-hidden py-4">
       {/* Background shape */}
       <div className="absolute top-[10%] left-[-15%] w-[450px] h-[450px] rounded-full bg-brand-green/10 blur-[120px] z-0 animate-pulse-glow" />
 
       {/* Hidden iframe for form submission without redirect */}
       <iframe name="hidden_iframe" id="hidden_iframe" className="hidden" title="hidden_iframe" style={{ display: "none" }}></iframe>
 
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-10 md:px-16 lg:px-24 relative z-10">
         {/* Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-8 space-y-3">
-          <h2 className="font-shareTech text-3xl sm:text-4xl font-extrabold tracking-tight text-brand-navy uppercase">
+        <div className="text-center max-w-3xl mx-auto mb-4 lg:mb-6 space-y-2">
+          <h2 className="font-shareTech text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-navy uppercase">
             Get Involved
           </h2>
           <div className="h-1 w-16 bg-brand-green mx-auto rounded-full" />
-          <p className="font-roboto font-light text-brand-navy/80 text-base leading-relaxed pt-1">
+          <p className="font-roboto font-light text-brand-navy/80 text-sm sm:text-base leading-relaxed pt-1">
             Whether you want to teach, partner up, or build with us, we have a place for you. Choose a track below to get started.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 items-stretch">
           {/* Left Side: Collaboration details */}
-          <div className="lg:col-span-5 space-y-3 flex flex-col">
+          <div className="md:col-span-5 space-y-2 flex flex-col">
             {getInvolvedTypes.map((option) => (
               <button
                 key={option.id}
                 onClick={() => setActiveForm(option.id)}
-                className={`text-left p-4 rounded-xl border transition-all duration-300 w-full group ${
+                className={`text-left p-3 lg:p-4 rounded-xl border transition-all duration-300 w-full group flex-1 flex flex-col justify-center ${
                   activeForm === option.id
                     ? "border-brand-navy bg-brand-navy shadow-lg"
                     : "border-slate-200 hover:border-brand-navy/30 bg-white hover:shadow-sm"
@@ -248,6 +308,11 @@ export default function CollaborationSection() {
                         : "bg-brand-navy/5 border-brand-navy/15 text-brand-navy group-hover:bg-brand-navy/10"
                     }`}
                   >
+                    {option.id === "services" && (
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                      </svg>
+                    )}
                     {option.id === "instructor" && (
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -286,8 +351,8 @@ export default function CollaborationSection() {
           </div>
 
           {/* Right Side: Quick Contact form */}
-          <div className="lg:col-span-7 flex items-stretch">
-            <div className="w-full glass-panel p-5 rounded-xl border border-brand-navy/10 flex flex-col shadow-sm bg-white min-h-[300px]">
+          <div className="md:col-span-7 flex items-stretch h-full">
+            <div className="w-full glass-panel p-4 lg:p-5 rounded-xl border border-brand-navy/10 flex flex-col shadow-sm bg-white min-h-[300px] h-full overflow-y-auto hide-scrollbar">
               <div className="mb-4 border-b border-slate-100 pb-3">
                 <h3 className="font-shareTech text-lg font-bold text-brand-navy uppercase tracking-wide">
                   {activeFormObj.title}
