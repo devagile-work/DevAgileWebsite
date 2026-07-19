@@ -9,6 +9,7 @@ export default function Navbar({ onRegisterClick }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredIdx, setHoveredIdx] = useState(null);
   const [coords, setCoords] = useState({ left: 0, width: 0 });
+  const [isNavigating, setIsNavigating] = useState(false);
   
   const router = useRouter();
   const { data: session } = useSession();
@@ -41,6 +42,7 @@ export default function Navbar({ onRegisterClick }) {
 
   const handleRegisterClick = (e) => {
     if (e) e.preventDefault();
+    setIsNavigating(true);
     if (session) {
       router.push("/dashboard");
     } else {
@@ -106,9 +108,17 @@ export default function Navbar({ onRegisterClick }) {
         <div className="hidden md:block relative">
           <button
             onClick={handleRegisterClick}
-            className="font-roboto text-sm font-bold bg-brand-navy text-white px-5 py-2 rounded-md hover:bg-brand-green hover:text-brand-navy hover:shadow-[0_4px_15px_rgba(89,202,147,0.3)] transition-all duration-300"
+            disabled={isNavigating}
+            className="flex items-center justify-center min-w-[90px] font-roboto text-sm font-bold bg-brand-navy text-white px-5 py-2 rounded-md hover:bg-brand-green hover:text-brand-navy hover:shadow-[0_4px_15px_rgba(89,202,147,0.3)] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Register
+            {isNavigating ? (
+              <svg className="animate-spin h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              "Register"
+            )}
           </button>
         </div>
 
@@ -169,9 +179,17 @@ export default function Navbar({ onRegisterClick }) {
           <div className="relative w-full mt-4">
             <button
               onClick={handleRegisterClick}
-              className="w-full font-roboto text-sm font-bold bg-brand-navy text-white px-5 py-3 rounded-lg hover:bg-brand-green hover:text-brand-navy transition-all duration-300 text-center shadow-sm"
+              disabled={isNavigating}
+              className="flex items-center justify-center w-full min-h-[44px] font-roboto text-sm font-bold bg-brand-navy text-white px-5 py-3 rounded-lg hover:bg-brand-green hover:text-brand-navy transition-all duration-300 text-center shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Register
+              {isNavigating ? (
+                <svg className="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                "Register"
+              )}
             </button>
           </div>
         </div>
