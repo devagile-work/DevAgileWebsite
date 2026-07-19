@@ -8,14 +8,12 @@ import LogoSpinner from "./LogoSpinner";
 export default function HeroSection({ onRegisterClick }) {
   const router = useRouter();
   const { data: session } = useSession();
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   const handleRegisterClick = (e) => {
     if (e) e.preventDefault();
-    if (session) {
-      router.push("/dashboard");
-    } else {
-      router.push("/loginAndSignUp");
-    }
+    setShowComingSoon(true);
+    setTimeout(() => setShowComingSoon(false), 3000);
   };
 
   return (
@@ -88,7 +86,7 @@ export default function HeroSection({ onRegisterClick }) {
           <img
             src="/logos/completeLogo.png"
             alt="DevAgile Logo"
-            className="h-24 sm:h-24 md:h-40 w-auto "
+            className="h-16 sm:h-20 md:h-24 w-auto mb-4"
           />
 
           {/* Description */}
@@ -108,7 +106,12 @@ export default function HeroSection({ onRegisterClick }) {
               >
                 Join our Bootcamp
               </button>
-              {/* showComingSoon removed */}
+              {showComingSoon && (
+                <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-brand-navy text-white text-sm py-2 px-4 rounded-xl shadow-[0_4px_20px_rgba(3,48,87,0.25)] whitespace-nowrap animate-bounce font-roboto font-medium z-50 pointer-events-none">
+                  Coming Soon
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-brand-navy"></div>
+                </div>
+              )}
             </div>
             <a
               href="#services"

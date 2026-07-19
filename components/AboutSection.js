@@ -66,12 +66,12 @@ export default function AboutSection() {
       {/* Background shape */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-brand-green/5 blur-[120px] z-0 pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 flex flex-col md:flex-row gap-12 md:gap-20 items-center">
         
         {/* ======================================= */}
         {/* LEFT SIDE: COMPACT CONTENT              */}
         {/* ======================================= */}
-        <div className="w-full lg:w-7/12 space-y-12">
+        <div className="w-full md:w-7/12 space-y-12">
           
           {/* Header */}
           <div>
@@ -121,7 +121,7 @@ export default function AboutSection() {
         {/* ======================================= */}
         {/* RIGHT SIDE: ANIMATED TECH VISUAL        */}
         {/* ======================================= */}
-        <div className="w-full lg:w-5/12 h-[450px] relative hidden md:flex items-center justify-center">
+        <div className="w-full md:w-5/12 h-[450px] relative hidden md:flex items-center justify-center">
           
           {/* Main Floating Terminal Window */}
           <div className="relative z-20 w-full max-w-sm bg-[#0A192F] rounded-lg shadow-2xl border border-brand-green/20 overflow-hidden anim-float">
