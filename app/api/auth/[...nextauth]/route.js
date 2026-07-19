@@ -26,7 +26,7 @@ export const authOptions = {
           throw new Error("No user found with this email");
         }
 
-        if (user.authProvider !== "credentials") {
+        if (user.authProvider !== "credentials" && user.authProvider !== "both" && !user.password) {
            throw new Error("Please sign in using your Google account");
         }
 

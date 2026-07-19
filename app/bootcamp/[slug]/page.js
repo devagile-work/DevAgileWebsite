@@ -2,8 +2,9 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getInternshipBySlug } from "../../../lib/internshipData";
 import connectMongoDB from "../../../lib/mongodb";
+import Bootcamp from "../../../models/Bootcamp";
+import Track from "../../../models/Track";
 import User from "../../../models/User"; // needed to check entitlements
 import RazorpayButton from "./RazorpayButton";
 import CoursePlanTabs from "./CoursePlanTabs";
@@ -20,7 +21,7 @@ export default async function BootcampPage({ params }) {
   const mongoose = require('mongoose');
   
   const [bootcamp, user] = await Promise.all([
-    Promise.resolve(getInternshipBySlug(params.slug)),
+    Bootcamp.findOne({ slug: params.slug }).populate('tracks').lean(),
     mongoose.connection.db.collection('users').findOne({ email: session.user.email })
   ]);
 
@@ -28,7 +29,7 @@ export default async function BootcampPage({ params }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-brand-white">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-brand-navy mb-4 font-shareTech">404 - Internship Not Found</h1>
+          <h1 className="text-4xl font-bold text-brand-navy mb-4 font-shareTech">404 - Bootcamp Not Found</h1>
           <Link href="/dashboard" className="text-brand-green hover:underline font-bold">Return to Dashboard</Link>
         </div>
       </div>
@@ -76,7 +77,7 @@ export default async function BootcampPage({ params }) {
           <div className="flex-1 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 bg-brand-green/20 border border-brand-green/50 text-brand-green font-bold text-[10px] px-3 py-1.5 rounded-full mb-6 font-shareTech tracking-widest uppercase shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse"></span>
-              Full Internship Bundle
+              Full Bootcamp Bundle
             </div>
             <h1 className="text-4xl lg:text-6xl font-black text-brand-navy mb-6 font-shareTech leading-tight drop-shadow-sm">
               {bootcamp.title}
@@ -105,7 +106,7 @@ export default async function BootcampPage({ params }) {
               </div>
               <div className="w-px h-20 bg-gray-200 hidden sm:block mx-4"></div>
               <div className="flex-1 w-full flex flex-col justify-center relative z-10">
-                <RazorpayButton amount={bootcamp.bundlePrice} itemName={`${bootcamp.title} (Full Bundle)`} itemId={bootcamp._id.toString()} itemType="Bootcamp" isBundle={true} compact={false} hasPurchased={hasPurchasedBootcamp} />
+                <RazorpayButton amount={bootcamp.bundlePrice} itemName={`${bootcamp.title} (Full Bundle)`} itemId={bootcamp._id.toString()} itemType="Bootcamp" isBundle={true} compact={false} hasPurchased={hasPurchasedBootcamp} firstTrackId={bootcamp.tracks[0]?._id?.toString()} />
                 <p className="text-gray-500 text-[10px] text-center mt-3 uppercase tracking-widest">Includes all {bootcamp.tracks.length} tracks</p>
                 {!hasPurchasedBootcamp && (
                   <a href="#individual-tracks" className="text-brand-navy hover:text-brand-green text-center text-xs font-bold uppercase tracking-wider mt-2 transition-colors">

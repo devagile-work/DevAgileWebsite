@@ -11,6 +11,7 @@ export default function AdminPanel() {
   const [bootcamps, setBootcamps] = useState([]);
   const [selectedBootcamp, setSelectedBootcamp] = useState(null);
   const [editingTrackId, setEditingTrackId] = useState(null);
+  const [users, setUsers] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -38,9 +39,42 @@ export default function AdminPanel() {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch("/api/admin/users", { headers: { "x-admin-password": password } });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setUsers(data.users);
+    } catch (err) {
+      setError("Failed to load users: " + err.message);
+    }
+  };
+
   useEffect(() => {
-    if (isAuthenticated) fetchBootcamps();
+    if (isAuthenticated) {
+      fetchBootcamps();
+      fetchUsers();
+    }
   }, [isAuthenticated]);
+
+  const handleDeleteUser = async (userId) => {
+    if (!confirm("Are you sure you want to permanently delete this user? This cannot be undone.")) return;
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: "DELETE",
+        headers: { "x-admin-password": password }
+      });
+      if (res.ok) {
+        alert("User deleted successfully.");
+        fetchUsers();
+      } else {
+        const data = await res.json();
+        alert("Failed to delete user: " + data.message);
+      }
+    } catch (error) {
+      alert("An error occurred while deleting the user.");
+    }
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -243,8 +277,14 @@ export default function AdminPanel() {
             Course Manager Dashboard
           </h1>
           <div className="flex gap-4">
-            {view !== "LIST_BOOTCAMPS" && (
+            {view !== "LIST_BOOTCAMPS" && view !== "LIST_USERS" && (
               <button onClick={() => setView("LIST_BOOTCAMPS")} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg border border-white/10 transition-colors">Back to Bootcamps</button>
+            )}
+            {view !== "LIST_USERS" && (
+              <button onClick={() => setView("LIST_USERS")} className="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 rounded-lg border border-indigo-500/30 transition-colors font-medium">Manage Users</button>
+            )}
+            {view === "LIST_USERS" && (
+              <button onClick={() => setView("LIST_BOOTCAMPS")} className="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 rounded-lg border border-indigo-500/30 transition-colors font-medium">Manage Bootcamps</button>
             )}
             <div className="px-4 py-2 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-sm font-medium flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Authenticated
@@ -277,6 +317,56 @@ export default function AdminPanel() {
                 </motion.div>
               ))}
               {bootcamps.length === 0 && <p className="text-gray-500 col-span-3">No bootcamps found.</p>}
+            </div>
+          </div>
+        )}
+
+        {view === "LIST_USERS" && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-white">Manage Users</h2>
+            <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+              <table className="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr className="bg-white/10 border-b border-white/10 text-xs uppercase tracking-wider text-gray-300 font-bold">
+                    <th className="p-4">Name & Email</th>
+                    <th className="p-4">Purchased Bootcamps</th>
+                    <th className="p-4">Purchased Tracks</th>
+                    <th className="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/10 text-gray-300">
+                  {users.map(user => (
+                    <tr key={user._id} className="hover:bg-white/5 transition-colors">
+                      <td className="p-4">
+                        <div className="font-bold text-white">{user.name}</div>
+                        <div className="text-xs text-gray-500">{user.email}</div>
+                      </td>
+                      <td className="p-4">
+                        {user.purchasedBootcamps?.length > 0 ? (
+                          <ul className="list-disc list-inside text-green-400 text-xs">
+                            {user.purchasedBootcamps.map(b => <li key={b._id}>{b.title}</li>)}
+                          </ul>
+                        ) : <span className="text-gray-600 italic text-xs">None</span>}
+                      </td>
+                      <td className="p-4">
+                        {user.purchasedTracks?.length > 0 ? (
+                          <ul className="list-disc list-inside text-blue-400 text-xs">
+                            {user.purchasedTracks.map(t => <li key={t._id}>{t.title}</li>)}
+                          </ul>
+                        ) : <span className="text-gray-600 italic text-xs">None</span>}
+                      </td>
+                      <td className="p-4 text-right">
+                        <button onClick={() => handleDeleteUser(user._id)} className="text-red-400 hover:text-red-300 bg-red-400/10 hover:bg-red-400/20 px-3 py-1.5 rounded transition-colors text-xs font-bold uppercase tracking-wider">
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {users.length === 0 && (
+                    <tr><td colSpan="4" className="p-8 text-center text-gray-500">No users found.</td></tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
