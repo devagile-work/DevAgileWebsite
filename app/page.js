@@ -33,23 +33,21 @@ export default function Home() {
 
       {/* Main Sections */}
       <main className="overflow-hidden">
-        <ScrollReveal direction="none" delay={100}>
+        <ScrollReveal animation="fade" delay={100}>
           <HeroSection onRegisterClick={handleOpenRegister} />
         </ScrollReveal>
         
-        <ScrollReveal direction="up" delay={200}>
-          <AboutSection />
-        </ScrollReveal>
+        <AboutSection />
         
-        <ScrollReveal direction="up" delay={200}>
+        <ScrollReveal animation="scale" delay={200}>
           <ServicesSection />
         </ScrollReveal>
 
-        <ScrollReveal direction="up" delay={200}>
+        <ScrollReveal animation="fade-up" delay={200}>
           <FeaturedProjects />
         </ScrollReveal>
         
-        <ScrollReveal direction="up" delay={200}>
+        <ScrollReveal animation="blur" delay={200}>
           <CollaborationSection />
         </ScrollReveal>
       </main>

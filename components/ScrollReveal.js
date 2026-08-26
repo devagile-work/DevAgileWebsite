@@ -1,55 +1,51 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 export default function ScrollReveal({ 
   children, 
   className = "", 
-  direction = "up", 
-  delay = 0 
+  animation = "fade-up", // options: fade-up, fade, slide-left, slide-right, scale, blur
+  delay = 0,
+  duration = 0.8
 }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
-    );
-
-    const currentRef = ref.current;
-    if (currentRef) {
-      observer.observe(currentRef);
+  const variants = {
+    "fade-up": {
+      hidden: { opacity: 0, y: 50 },
+      visible: { opacity: 1, y: 0 },
+    },
+    "fade": {
+      hidden: { opacity: 0 },
+      visible: { opacity: 1 },
+    },
+    "slide-left": {
+      hidden: { opacity: 0, x: -50 },
+      visible: { opacity: 1, x: 0 },
+    },
+    "slide-right": {
+      hidden: { opacity: 0, x: 50 },
+      visible: { opacity: 1, x: 0 },
+    },
+    "scale": {
+      hidden: { opacity: 0, scale: 0.9 },
+      visible: { opacity: 1, scale: 1 },
+    },
+    "blur": {
+      hidden: { opacity: 0, filter: "blur(10px)" },
+      visible: { opacity: 1, filter: "blur(0px)" },
     }
-
-    return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, []);
-
-  const baseClasses = "transition-all duration-1000 ease-out";
-  const hiddenClasses = {
-    up: "opacity-0 translate-y-12",
-    down: "opacity-0 -translate-y-12",
-    left: "opacity-0 translate-x-12",
-    right: "opacity-0 -translate-x-12",
-    none: "opacity-0",
   };
 
-  const visibleClasses = "opacity-100 translate-y-0 translate-x-0";
-
   return (
-    <div
-      ref={ref}
-      className={`${baseClasses} ${isVisible ? visibleClasses : hiddenClasses[direction]} ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
+    <motion.div
+      className={className}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration, delay: delay / 1000, ease: "easeOut" }}
+      variants={variants[animation] || variants["fade-up"]}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }

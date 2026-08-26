@@ -24,7 +24,7 @@ export default function HeroSection({ onRegisterClick }) {
   return (
     <section
       id="home"
-      className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-brand-white pt-16 md:pt-24 pb-16"
+      className="relative min-h-screen w-full flex flex-col items-center justify-center bg-brand-white pt-16 md:pt-24 pb-16"
     >
       {/* Background Gradients */}
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -36,7 +36,7 @@ export default function HeroSection({ onRegisterClick }) {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(3,48,87,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(3,48,87,0.02)_1px,transparent_1px)] bg-[size:40px_40px] z-0" />
 
       {/* Top-Left Diagonal Marquee */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/3 rotate-[30deg] w-[200vw] py-3 bg-brand-navy text-brand-green shadow-lg z-10 overflow-hidden select-none border-y border-brand-green/20 flex whitespace-nowrap">
+      <div className="absolute top-10 left-1/2 -translate-x-1/3 rotate-[15deg] w-[200vw] py-3 bg-brand-navy text-brand-green shadow-lg z-10 overflow-hidden select-none border-y border-brand-green/20 flex whitespace-nowrap">
         <div className="animate-marquee flex whitespace-nowrap shrink-0">
           {[...Array(8)].map((_, i) => (
             <span key={i} className="mx-6 font-shareTech text-sm uppercase tracking-widest font-bold text-brand-green">
@@ -54,7 +54,7 @@ export default function HeroSection({ onRegisterClick }) {
       </div>
 
       {/* Bottom-Right Diagonal Marquee */}
-      <div className="absolute bottom-0 left-1/4 -translate-x-1/2 rotate-[30deg] w-[200vw] py-3 bg-brand-green text-brand-navy shadow-lg z-10 overflow-hidden select-none border-y border-brand-navy/20 flex whitespace-nowrap">
+      <div className="absolute bottom-[-10px] left-1/4 -translate-x-1/2 rotate-[15deg] w-[200vw] py-3 bg-brand-green text-brand-navy shadow-lg z-40 overflow-hidden select-none border-y border-brand-navy/20 flex whitespace-nowrap pointer-events-none">
         <div className="animate-marquee flex whitespace-nowrap shrink-0">
           {[...Array(8)].map((_, i) => (
             <span key={i} className="mx-6 font-shareTech text-sm uppercase tracking-widest font-bold text-brand-navy">
