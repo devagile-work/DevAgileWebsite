@@ -2,6 +2,8 @@ import connectMongo from "@/lib/mongodb";
 import WorkshopRegistration from "@/models/WorkshopRegistration";
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req, { params }) {
   try {
     const password = req.headers.get("x-admin-password");

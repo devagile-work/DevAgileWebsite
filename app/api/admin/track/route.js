@@ -3,6 +3,8 @@ import Track from "@/models/Track";
 import Bootcamp from "@/models/Bootcamp";
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req) {
   try {
     const password = req.headers.get("x-admin-password");
