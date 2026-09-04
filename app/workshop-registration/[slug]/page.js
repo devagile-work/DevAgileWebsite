@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function WorkshopRegistration() {
+export default function WorkshopRegistration({ params }) {
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [email, setEmail] = useState("");
@@ -13,6 +13,9 @@ export default function WorkshopRegistration() {
   const [loading, setLoading] = useState(false);
   const [isPlanOpen, setIsPlanOpen] = useState(false);
   const router = useRouter();
+  
+  // React hook to unwrap params if needed in React 19/Next 15, but Next 13/14 just accepts it.
+  const slug = params?.slug;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,22 +23,18 @@ export default function WorkshopRegistration() {
     setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("entry.1474281216", name);
-      formData.append("entry.2123621516", contact);
-      formData.append("entry.305079290", email);
-      formData.append("entry.1657858962", expectations);
-
-      await fetch("https://docs.google.com/forms/d/e/1FAIpQLSc7l1uG5gTXejoQs1rVeWtZqpwnB97CTXPcXJTZYqN1WHqaMA/formResponse", {
+      const res = await fetch(`/api/workshops/${slug}/register`, {
         method: "POST",
-        mode: "no-cors",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, contact, expectations })
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Registration failed");
 
-      // Redirect to WhatsApp community upon success
-      window.location.href = "https://chat.whatsapp.com/ESE3zZpJDKGEEgP4vMPabl";
+      // Redirect to actual workshop viewer upon success
+      router.push(`/dashboard/workshops/${slug}`);
     } catch (err) {
-      setError("An error occurred during registration. Please try again.");
+      setError(err.message || "An error occurred during registration. Please try again.");
       setLoading(false);
     }
   };

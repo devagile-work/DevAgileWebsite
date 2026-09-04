@@ -45,7 +45,7 @@ export const metadata = {
   },
 };
 
-import Footer from "../components/Footer";
+import ConditionalFooter from "@/components/ConditionalFooter";
 
 export default function RootLayout({ children }) {
   return (
@@ -56,7 +56,7 @@ export default function RootLayout({ children }) {
             <div className="flex-1">
               {children}
             </div>
-            <Footer />
+            <ConditionalFooter />
           </div>
         </AuthProvider>
       </body>

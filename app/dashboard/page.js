@@ -7,6 +7,8 @@ import Link from "next/link";
 import connectMongoDB from "../../lib/mongodb";
 import Bootcamp from "../../models/Bootcamp";
 import User from "../../models/User";
+import Workshop from "../../models/Workshop";
+import WorkshopRegistration from "../../models/WorkshopRegistration";
 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
@@ -20,6 +22,11 @@ export default async function Dashboard() {
   const hasPassword = !!dbUser?.password;
 
   const bootcamps = await Bootcamp.find({}).lean();
+  const workshops = await Workshop.find({}).lean();
+  
+  // Find which workshops the user is registered for
+  const registrations = await WorkshopRegistration.find({ userEmail: session.user.email }).lean();
+  const registeredWorkshopIds = new Set(registrations.map(r => r.workshopId.toString()));
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-brand-white font-roboto">
@@ -87,29 +94,52 @@ export default async function Dashboard() {
               </div>
               
               <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3 lg:gap-4">
-                <Link href="/workshop-registration" className="block group h-full">
-                  <div className="bg-brand-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(3,48,87,0.06)] border border-brand-green/30 hover:shadow-[0_8px_30px_rgba(3,48,87,0.12)] transition-all duration-300 hover:-translate-y-1 flex flex-col h-full relative aspect-square">
-                    <div className="absolute inset-0 bg-brand-green/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-                    <div className="relative flex-[0_0_45%] w-full bg-brand-navy/5 overflow-hidden">
-                      <img src="/poster/webdevworkshop.png" alt="Web Dev Workshop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      <div className="absolute top-2 right-2 bg-brand-green text-brand-navy font-bold text-[8px] px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-1 border border-brand-green/20 font-shareTech animate-pulse">
-                        LIVE NOW
+                {workshops.map(workshop => {
+                  const isRegistered = registeredWorkshopIds.has(workshop._id.toString());
+                  const linkHref = isRegistered ? `/dashboard/workshops/${workshop.slug}` : `/workshop-registration/${workshop.slug}`;
+                  
+                  const getValidImageUrl = (url) => {
+                    if (!url) return null;
+                    const gdriveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//);
+                    if (gdriveMatch) {
+                      const directUrl = `https://drive.google.com/uc?export=view&id=${gdriveMatch[1]}`;
+                      return `/api/image-proxy?url=${encodeURIComponent(directUrl)}`;
+                    }
+                    if (url.includes('drive.google.com/uc')) {
+                      return `/api/image-proxy?url=${encodeURIComponent(url)}`;
+                    }
+                    return url;
+                  };
+                  
+                  return (
+                    <Link key={workshop._id.toString()} href={linkHref} className="block group h-full">
+                      <div className="bg-brand-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(3,48,87,0.06)] border border-brand-green/30 hover:shadow-[0_8px_30px_rgba(3,48,87,0.12)] transition-all duration-300 hover:-translate-y-1 flex flex-col h-full relative aspect-square">
+                        <div className="absolute inset-0 bg-brand-green/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                        <div className="relative flex-[0_0_45%] w-full bg-brand-navy/5 overflow-hidden">
+                          <img src={getValidImageUrl(workshop.image) || "/poster/webdevworkshop.png"} alt={workshop.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <div className="absolute top-2 right-2 bg-brand-green text-brand-navy font-bold text-[8px] px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-1 border border-brand-green/20 font-shareTech animate-pulse">
+                            {isRegistered ? "CONTINUE" : "LIVE NOW"}
+                          </div>
+                        </div>
+                        <div className="p-2.5 lg:p-3 flex flex-col flex-1 overflow-hidden">
+                          <h3 className="text-sm lg:text-base font-bold text-brand-navy mb-1 font-shareTech leading-tight group-hover:text-brand-green transition-colors line-clamp-1">{workshop.title}</h3>
+                          <p className="text-brand-navy/70 text-[10px] lg:text-xs mb-3 flex-1 leading-relaxed line-clamp-2">
+                            {workshop.description}
+                          </p>
+                          <button className="w-full mt-auto bg-brand-green text-brand-navy font-bold py-1.5 lg:py-2 rounded-md hover:bg-brand-green/90 transition-all shadow-md hover:shadow-brand-green/30 flex justify-center items-center gap-1.5 font-shareTech uppercase tracking-wide text-[9px] lg:text-[10px] pointer-events-none">
+                            <span>{isRegistered ? "Continue Learning" : "Register Now"}</span>
+                            <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="p-2.5 lg:p-3 flex flex-col flex-1 overflow-hidden">
-                      <h3 className="text-sm lg:text-base font-bold text-brand-navy mb-1 font-shareTech leading-tight group-hover:text-brand-green transition-colors line-clamp-1">Complete Web Development Workshop</h3>
-                      <p className="text-brand-navy/70 text-[10px] lg:text-xs mb-3 flex-1 leading-relaxed line-clamp-2">
-                        Learn the fundamentals of web development in this interactive workshop. Perfect for beginners and aspiring developers.
-                      </p>
-                      <button className="w-full mt-auto bg-brand-green text-brand-navy font-bold py-1.5 lg:py-2 rounded-md hover:bg-brand-green/90 transition-all shadow-md hover:shadow-brand-green/30 flex justify-center items-center gap-1.5 font-shareTech uppercase tracking-wide text-[9px] lg:text-[10px] pointer-events-none">
-                        <span>Register Now</span>
-                        <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </Link>
+                    </Link>
+                  );
+                })}
+                {workshops.length === 0 && (
+                   <p className="text-sm text-brand-navy/60 p-4">No workshops available right now. Check back later!</p>
+                )}
               </div>
             </div>
 
@@ -126,12 +156,26 @@ export default async function Dashboard() {
               </div>
 
               <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3 lg:gap-4">
-                {bootcamps.map((bootcamp) => (
-                  <div key={bootcamp._id.toString()} className="block group h-full cursor-not-allowed opacity-80">
-                    <div className="bg-brand-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(3,48,87,0.06)] border border-brand-navy/10 transition-all duration-300 flex flex-col h-full aspect-square">
-                      <div className="relative flex-[0_0_45%] w-full bg-brand-navy/5 overflow-hidden">
-                        <img src={bootcamp.image || "/poster/techMastery.png"} alt={bootcamp.title} className="w-full h-full object-cover grayscale" />
-                        <div className="absolute top-2 right-2 bg-brand-white/95 backdrop-blur text-brand-navy font-bold text-[8px] px-1.5 py-0.5 rounded-full shadow-sm flex items-center gap-1 border border-brand-navy/10 font-shareTech">
+                {bootcamps.map((bootcamp) => {
+                  const getValidImageUrl = (url) => {
+                    if (!url) return null;
+                    const gdriveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//);
+                    if (gdriveMatch) {
+                      const directUrl = `https://drive.google.com/uc?export=view&id=${gdriveMatch[1]}`;
+                      return `/api/image-proxy?url=${encodeURIComponent(directUrl)}`;
+                    }
+                    if (url.includes('drive.google.com/uc')) {
+                      return `/api/image-proxy?url=${encodeURIComponent(url)}`;
+                    }
+                    return url;
+                  };
+
+                  return (
+                    <div key={bootcamp._id.toString()} className="block group h-full cursor-not-allowed opacity-80">
+                      <div className="bg-brand-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(3,48,87,0.06)] border border-brand-navy/10 transition-all duration-300 flex flex-col h-full aspect-square">
+                        <div className="relative flex-[0_0_45%] w-full bg-brand-navy/5 overflow-hidden">
+                          <img src={getValidImageUrl(bootcamp.image) || "/poster/techMastery.png"} alt={bootcamp.title} className="w-full h-full object-cover grayscale" />
+                          <div className="absolute top-2 right-2 bg-brand-white/95 backdrop-blur text-brand-navy font-bold text-[8px] px-1.5 py-0.5 rounded-full shadow-sm flex items-center gap-1 border border-brand-navy/10 font-shareTech">
                           COMING SOON
                         </div>
                       </div>
@@ -156,9 +200,10 @@ export default async function Dashboard() {
                           <span>Coming Soon</span>
                         </button>
                       </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             

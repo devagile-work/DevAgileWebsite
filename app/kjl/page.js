@@ -7,11 +7,18 @@ export default function AdminPanel() {
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
-  const [view, setView] = useState("LIST_BOOTCAMPS"); // LIST_BOOTCAMPS, CREATE_BOOTCAMP, VIEW_BOOTCAMP, CREATE_TRACK, EDIT_TRACK
+  const [view, setView] = useState("LIST_BOOTCAMPS"); // LIST_BOOTCAMPS, CREATE_BOOTCAMP, VIEW_BOOTCAMP, CREATE_TRACK, EDIT_TRACK, LIST_WORKSHOPS, CREATE_WORKSHOP, VIEW_WORKSHOP
   const [bootcamps, setBootcamps] = useState([]);
   const [selectedBootcamp, setSelectedBootcamp] = useState(null);
   const [editingTrackId, setEditingTrackId] = useState(null);
   const [users, setUsers] = useState([]);
+
+  const [workshops, setWorkshops] = useState([]);
+  const [selectedWorkshop, setSelectedWorkshop] = useState(null);
+  const [workshopForm, setWorkshopForm] = useState({ title: "", slug: "", description: "", image: "", lectures: [] });
+  const [lectureForm, setLectureForm] = useState({ title: "", youtubeVideoId: "", quiz: [] });
+  const [editingLectureIdx, setEditingLectureIdx] = useState(null);
+  const [workshopStats, setWorkshopStats] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -50,10 +57,44 @@ export default function AdminPanel() {
     }
   };
 
+  const fetchWorkshops = async () => {
+    try {
+      const res = await fetch("/api/admin/workshops", { headers: { "x-admin-password": password } });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setWorkshops(data.workshops);
+      if (selectedWorkshop) {
+        const updated = data.workshops.find(w => w._id === selectedWorkshop._id);
+        if (updated) setSelectedWorkshop(updated);
+      }
+    } catch (err) {
+      setError("Failed to load workshops: " + err.message);
+    }
+  };
+
+  const fetchWorkshopStats = async (id) => {
+    try {
+      const res = await fetch(`/api/admin/workshops/${id}/stats`, { headers: { "x-admin-password": password } });
+      const data = await res.json();
+      if (res.ok) {
+        setWorkshopStats(data.registrations);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const selectWorkshop = (w) => {
+    setSelectedWorkshop(w);
+    fetchWorkshopStats(w._id);
+    setView("VIEW_WORKSHOP");
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchBootcamps();
       fetchUsers();
+      fetchWorkshops();
     }
   }, [isAuthenticated]);
 
@@ -84,6 +125,7 @@ export default function AdminPanel() {
   const handleBootcampSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); setError("");
+
     try {
       const res = await fetch("/api/admin/bootcamp", {
         method: "POST",
@@ -92,8 +134,9 @@ export default function AdminPanel() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
+      
       alert("Bootcamp created!");
-      setBootcampForm({ slug: "", title: "", description: "", image: "", bundlePrice: 0 });
+      setBootcampForm({ title: "", slug: "", description: "", image: "", bundlePrice: 0 });
       fetchBootcamps();
       setView("LIST_BOOTCAMPS");
     } catch (err) {
@@ -101,6 +144,127 @@ export default function AdminPanel() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const deleteBootcamp = async (id, e) => {
+    if (e) e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this bootcamp and all its tracks?")) return;
+    try {
+      const res = await fetch(`/api/admin/bootcamp/${id}`, {
+        method: "DELETE",
+        headers: { "x-admin-password": password },
+      });
+      if (res.ok) {
+        fetchBootcamps();
+        setView("LIST_BOOTCAMPS");
+      }
+    } catch (err) {
+      alert("Error deleting bootcamp");
+    }
+  };
+
+  const handleWorkshopSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true); setError("");
+    try {
+      const isEdit = !!selectedWorkshop;
+      const method = isEdit ? "PUT" : "POST";
+      const url = isEdit ? `/api/admin/workshops/${selectedWorkshop._id}` : "/api/admin/workshops";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify(workshopForm),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      alert(isEdit ? "Workshop updated!" : "Workshop created!");
+      setWorkshopForm({ title: "", slug: "", description: "", image: "", lectures: [] });
+      fetchWorkshops();
+      setView("LIST_WORKSHOPS");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteWorkshop = async (id, e) => {
+    if (e) e.stopPropagation();
+    if (!confirm("Are you sure?")) return;
+    try {
+      const res = await fetch(`/api/admin/workshops/${id}`, {
+        method: "DELETE",
+        headers: { "x-admin-password": password },
+      });
+      if (res.ok) {
+        fetchWorkshops();
+        setView("LIST_WORKSHOPS");
+      }
+    } catch (err) {
+      alert("Error deleting workshop");
+    }
+  };
+
+  const addLectureToWorkshop = async (e) => {
+    e.preventDefault();
+    if (!selectedWorkshop) return;
+    setLoading(true); setError("");
+    try {
+      const updatedLectures = [...selectedWorkshop.lectures];
+      if (editingLectureIdx !== null) {
+        updatedLectures[editingLectureIdx] = lectureForm;
+      } else {
+        updatedLectures.push(lectureForm);
+      }
+      const res = await fetch(`/api/admin/workshops/${selectedWorkshop._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ lectures: updatedLectures }),
+      });
+      if (res.ok) {
+        alert(editingLectureIdx !== null ? "Lecture updated!" : "Lecture added!");
+        setLectureForm({ title: "", youtubeVideoId: "", quiz: [] });
+        setEditingLectureIdx(null);
+        fetchWorkshops();
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteLectureFromWorkshop = async (idx) => {
+    if (!confirm("Are you sure you want to delete this lecture?")) return;
+    setLoading(true); setError("");
+    try {
+      const updatedLectures = [...selectedWorkshop.lectures];
+      updatedLectures.splice(idx, 1);
+      const res = await fetch(`/api/admin/workshops/${selectedWorkshop._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ lectures: updatedLectures }),
+      });
+      if (res.ok) {
+        fetchWorkshops();
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startEditLecture = (lec, idx) => {
+    setLectureForm({ ...lec });
+    setEditingLectureIdx(idx);
+    // Scroll down to the form
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
+  const cancelEditLecture = () => {
+    setLectureForm({ title: "", youtubeVideoId: "", quiz: [] });
+    setEditingLectureIdx(null);
   };
 
   const startEditTrack = (track) => {
@@ -277,15 +441,10 @@ export default function AdminPanel() {
             Course Manager Dashboard
           </h1>
           <div className="flex gap-4">
-            {view !== "LIST_BOOTCAMPS" && view !== "LIST_USERS" && (
-              <button onClick={() => setView("LIST_BOOTCAMPS")} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg border border-white/10 transition-colors">Back to Bootcamps</button>
-            )}
-            {view !== "LIST_USERS" && (
-              <button onClick={() => setView("LIST_USERS")} className="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 rounded-lg border border-indigo-500/30 transition-colors font-medium">Manage Users</button>
-            )}
-            {view === "LIST_USERS" && (
-              <button onClick={() => setView("LIST_BOOTCAMPS")} className="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 rounded-lg border border-indigo-500/30 transition-colors font-medium">Manage Bootcamps</button>
-            )}
+            <button onClick={() => setView("LIST_BOOTCAMPS")} className={`px-4 py-2 rounded-lg border transition-colors font-medium ${view.includes("BOOTCAMP") || view.includes("TRACK") ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-gray-800 hover:bg-gray-700 text-gray-300 border-white/10'}`}>Bootcamps</button>
+            <button onClick={() => setView("LIST_WORKSHOPS")} className={`px-4 py-2 rounded-lg border transition-colors font-medium ${view.includes("WORKSHOP") ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-gray-800 hover:bg-gray-700 text-gray-300 border-white/10'}`}>Workshops</button>
+            <button onClick={() => setView("LIST_USERS")} className={`px-4 py-2 rounded-lg border transition-colors font-medium ${view === "LIST_USERS" ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-gray-800 hover:bg-gray-700 text-gray-300 border-white/10'}`}>Users</button>
+            
             <div className="px-4 py-2 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-sm font-medium flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Authenticated
             </div>
@@ -307,8 +466,11 @@ export default function AdminPanel() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {bootcamps.map(b => (
-                <motion.div key={b._id} whileHover={{ scale: 1.02 }} className="bg-white/5 border border-white/10 rounded-xl p-6 cursor-pointer hover:border-blue-500/50 transition-colors" onClick={() => { setSelectedBootcamp(b); setView("VIEW_BOOTCAMP"); }}>
-                  <h3 className="text-xl font-bold text-white mb-2">{b.title}</h3>
+                <motion.div key={b._id} whileHover={{ scale: 1.02 }} className="bg-white/5 border border-white/10 rounded-xl p-6 cursor-pointer hover:border-blue-500/50 transition-colors relative group" onClick={() => { setSelectedBootcamp(b); setView("VIEW_BOOTCAMP"); }}>
+                  <button onClick={(e) => deleteBootcamp(b._id, e)} className="absolute top-4 right-4 bg-red-600/20 text-red-400 p-1.5 rounded opacity-0 group-hover:opacity-100 hover:bg-red-600 hover:text-white transition-all">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                  <h3 className="text-xl font-bold text-white mb-2 pr-8">{b.title}</h3>
                   <p className="text-gray-400 text-sm mb-4 line-clamp-2">{b.description}</p>
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-blue-400 font-semibold">${b.bundlePrice}</span>
@@ -407,10 +569,17 @@ export default function AdminPanel() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 relative overflow-hidden">
                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
-              <h2 className="text-3xl font-bold text-white mb-4">{selectedBootcamp.title}</h2>
-              <p className="text-gray-400 mb-6">{selectedBootcamp.description}</p>
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-4">{selectedBootcamp.title}</h2>
+                  <p className="text-gray-400 mb-6">{selectedBootcamp.description}</p>
+                </div>
+                <div className="flex gap-2">
+                   <button onClick={() => deleteBootcamp(selectedBootcamp._id)} className="px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 rounded-lg font-medium text-sm">Delete</button>
+                </div>
+              </div>
               
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-6 border-t border-white/10 pt-6">
                 <h3 className="text-xl font-bold text-white">Tracks in this Bootcamp</h3>
                 <button onClick={startCreateTrack} className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium">+ Add Track</button>
               </div>
@@ -516,6 +685,223 @@ export default function AdminPanel() {
               </button>
             </div>
           </motion.form>
+        )}
+        {(view === "CREATE_TRACK" || view === "EDIT_TRACK") && selectedBootcamp && (
+          <motion.form initial={{ opacity: 0 }} animate={{ opacity: 1 }} onSubmit={handleTrackSubmit} className="space-y-8 max-w-4xl mx-auto">
+            {/* track forms (unchanged in this replace) */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 relative overflow-hidden">
+               {/* ... */}
+            </div>
+          </motion.form>
+        )}
+
+        {view === "LIST_WORKSHOPS" && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-white">Workshops</h2>
+              <button onClick={() => { setSelectedWorkshop(null); setWorkshopForm({ title: "", slug: "", description: "", image: "", lectures: [] }); setView("CREATE_WORKSHOP"); }} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium">Create New Workshop</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {workshops.map(w => (
+                <motion.div key={w._id} whileHover={{ scale: 1.02 }} className="bg-white/5 border border-white/10 rounded-xl p-6 cursor-pointer hover:border-blue-500/50 transition-colors relative group" onClick={() => selectWorkshop(w)}>
+                  <button onClick={(e) => deleteWorkshop(w._id, e)} className="absolute top-4 right-4 bg-red-600/20 text-red-400 p-1.5 rounded opacity-0 group-hover:opacity-100 hover:bg-red-600 hover:text-white transition-all">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                  <h3 className="text-xl font-bold text-white mb-2 pr-8">{w.title}</h3>
+                  <p className="text-gray-400 text-sm mb-4 line-clamp-2">{w.description}</p>
+                  <div className="flex justify-between items-center text-sm">
+                     <span className="text-blue-400 font-semibold">{w.slug}</span>
+                     <span className="bg-purple-500/20 text-purple-300 px-2 py-1 rounded">{w.lectures?.length || 0} Lectures</span>
+                  </div>
+                </motion.div>
+              ))}
+              {workshops.length === 0 && <p className="text-gray-500 col-span-3">No workshops found.</p>}
+            </div>
+          </div>
+        )}
+
+        {(view === "CREATE_WORKSHOP" || view === "EDIT_WORKSHOP") && (
+          <motion.form initial={{ opacity: 0 }} animate={{ opacity: 1 }} onSubmit={handleWorkshopSubmit} className="bg-white/5 border border-white/10 rounded-2xl p-8 max-w-2xl mx-auto space-y-6 relative overflow-hidden">
+             <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+            <h2 className="text-2xl font-bold text-white">{selectedWorkshop ? "Edit Workshop" : "Create Workshop"}</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <label className="block text-sm text-gray-400 mb-1">Title</label>
+                <input type="text" value={workshopForm.title} onChange={e => setWorkshopForm({...workshopForm, title: e.target.value})} className="w-full p-3 rounded-lg bg-black/50 border border-white/10 focus:border-blue-500 outline-none" required />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Slug</label>
+                <input type="text" value={workshopForm.slug} onChange={e => setWorkshopForm({...workshopForm, slug: e.target.value})} className="w-full p-3 rounded-lg bg-black/50 border border-white/10 focus:border-blue-500 outline-none" required />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm text-gray-400 mb-1">Image URL</label>
+                <input type="text" value={workshopForm.image} onChange={e => setWorkshopForm({...workshopForm, image: e.target.value})} className="w-full p-3 rounded-lg bg-black/50 border border-white/10 focus:border-blue-500 outline-none" required />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm text-gray-400 mb-1">Description</label>
+                <textarea value={workshopForm.description} onChange={e => setWorkshopForm({...workshopForm, description: e.target.value})} className="w-full p-3 rounded-lg bg-black/50 border border-white/10 focus:border-blue-500 outline-none h-24" required />
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <button type="submit" disabled={loading} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all">{loading ? "Saving..." : "Save Workshop"}</button>
+            </div>
+          </motion.form>
+        )}
+
+        {view === "VIEW_WORKSHOP" && selectedWorkshop && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 relative overflow-hidden">
+               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-2">{selectedWorkshop.title}</h2>
+                  <p className="text-gray-400 mb-6">{selectedWorkshop.description}</p>
+                </div>
+                <div className="flex gap-2">
+                   <button onClick={() => { setWorkshopForm(selectedWorkshop); setView("EDIT_WORKSHOP"); }} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium text-sm">Edit Details</button>
+                   <button onClick={() => deleteWorkshop(selectedWorkshop._id)} className="px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 rounded-lg font-medium text-sm">Delete</button>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center mb-6 mt-8 pt-8 border-t border-white/10">
+                <h3 className="text-xl font-bold text-white">Lectures</h3>
+              </div>
+              
+              <div className="space-y-4 mb-8">
+                {selectedWorkshop.lectures?.map((lec, idx) => (
+                  <div key={idx} className="bg-black/40 border border-white/10 rounded-xl p-4 flex justify-between items-start group">
+                    <div>
+                      <h4 className="text-lg font-bold text-blue-400">{lec.title}</h4>
+                      <p className="text-sm text-gray-400 mb-2">YouTube ID: {lec.youtubeVideoId}</p>
+                      {lec.quiz?.length > 0 ? (
+                         <p className="text-xs text-green-400">{lec.quiz.length} Quiz Questions</p>
+                      ) : (
+                         <p className="text-xs text-yellow-400">No Quiz Added</p>
+                      )}
+                    </div>
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => startEditLecture(lec, idx)} className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded transition-colors">Edit</button>
+                      <button onClick={() => deleteLectureFromWorkshop(idx)} className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 text-sm rounded transition-colors">Delete</button>
+                    </div>
+                  </div>
+                ))}
+                {(!selectedWorkshop.lectures || selectedWorkshop.lectures.length === 0) && <p className="text-gray-500">No lectures added yet.</p>}
+              </div>
+
+              {/* Add Lecture Form */}
+              <div className="bg-black/20 p-6 rounded-xl border border-white/5 mb-8">
+                <div className="flex justify-between items-center mb-4">
+                   <h4 className="text-lg font-bold text-white">{editingLectureIdx !== null ? "Edit Lecture" : "Add New Lecture"}</h4>
+                   {editingLectureIdx !== null && (
+                      <button onClick={cancelEditLecture} className="text-sm text-gray-400 hover:text-white">Cancel Edit</button>
+                   )}
+                </div>
+                <form onSubmit={addLectureToWorkshop} className="space-y-4">
+                   <div className="grid grid-cols-2 gap-4">
+                     <div>
+                       <label className="block text-sm text-gray-400 mb-1">Lecture Title</label>
+                       <input type="text" value={lectureForm.title} onChange={e => setLectureForm({...lectureForm, title: e.target.value})} className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 focus:border-blue-500 outline-none text-sm" required />
+                     </div>
+                     <div>
+                       <label className="block text-sm text-gray-400 mb-1">YouTube Video ID (e.g. dQw4w9WgXcQ)</label>
+                       <input type="text" value={lectureForm.youtubeVideoId} onChange={e => setLectureForm({...lectureForm, youtubeVideoId: e.target.value})} className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 focus:border-blue-500 outline-none text-sm" required />
+                     </div>
+                   </div>
+                   
+                   <div className="mt-4 pt-4 border-t border-white/10">
+                     <div className="flex justify-between items-center mb-4">
+                       <p className="text-sm font-bold text-white">Quiz Questions</p>
+                       <button type="button" onClick={() => setLectureForm({...lectureForm, quiz: [...(lectureForm.quiz || []), { question: "", options: ["", "", "", ""], correctOptionIndex: 0 }]})} className="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 rounded-lg text-xs font-medium">Add Question</button>
+                     </div>
+                     
+                     <div className="space-y-6">
+                       {lectureForm.quiz?.map((q, qIndex) => (
+                         <div key={qIndex} className="p-4 bg-black/30 rounded-lg border border-white/5 relative">
+                           <button type="button" onClick={() => {
+                             const newQuiz = [...lectureForm.quiz];
+                             newQuiz.splice(qIndex, 1);
+                             setLectureForm({...lectureForm, quiz: newQuiz});
+                           }} className="absolute top-4 right-4 text-gray-500 hover:text-red-400 text-xs">Remove</button>
+                           
+                           <input type="text" placeholder={`Question ${qIndex + 1}?`} value={q.question} onChange={e => {
+                             const newQuiz = [...lectureForm.quiz];
+                             newQuiz[qIndex].question = e.target.value;
+                             setLectureForm({...lectureForm, quiz: newQuiz});
+                           }} className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 focus:border-blue-500 outline-none text-sm mb-3" required />
+                           
+                           <div className="grid grid-cols-2 gap-3">
+                             {[0, 1, 2, 3].map(i => (
+                                <div key={i} className="flex gap-2 items-center">
+                                  <input type="radio" name={`correctOption-${qIndex}`} checked={q.correctOptionIndex === i} onChange={() => {
+                                     const newQuiz = [...lectureForm.quiz];
+                                     newQuiz[qIndex].correctOptionIndex = i;
+                                     setLectureForm({...lectureForm, quiz: newQuiz});
+                                  }} />
+                                  <input type="text" placeholder={`Option ${i+1}`} value={q.options[i]} onChange={e => {
+                                     const newQuiz = [...lectureForm.quiz];
+                                     newQuiz[qIndex].options[i] = e.target.value;
+                                     setLectureForm({...lectureForm, quiz: newQuiz});
+                                  }} className="flex-1 p-2 rounded-lg bg-black/50 border border-white/10 focus:border-blue-500 outline-none text-xs" required />
+                                </div>
+                             ))}
+                           </div>
+                         </div>
+                       ))}
+                       {(!lectureForm.quiz || lectureForm.quiz.length === 0) && <p className="text-xs text-gray-500">No quiz questions added for this lecture.</p>}
+                     </div>
+                   </div>
+
+                   <div className="flex justify-end mt-4 pt-4 border-t border-white/10">
+                     <button type="submit" className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold shadow-md transition-all">
+                       {editingLectureIdx !== null ? "Update Lecture" : "Save Lecture"}
+                     </button>
+                   </div>
+                </form>
+              </div>
+
+              {/* Student Stats */}
+              <div className="flex justify-between items-center mb-6 mt-8 pt-8 border-t border-white/10">
+                <h3 className="text-xl font-bold text-white">Student Progress</h3>
+              </div>
+              <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                <table className="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr className="bg-white/10 border-b border-white/10 text-xs uppercase tracking-wider text-gray-300 font-bold">
+                      <th className="p-4">Student</th>
+                      <th className="p-4">Contact</th>
+                      <th className="p-4">Lectures Watched</th>
+                      <th className="p-4">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10 text-gray-300">
+                    {workshopStats.map(stat => {
+                      const watchedCount = stat.progress.filter(p => p.watched).length;
+                      return (
+                        <tr key={stat._id} className="hover:bg-white/5 transition-colors">
+                          <td className="p-4">
+                            <div className="font-bold text-white">{stat.name}</div>
+                            <div className="text-xs text-gray-500">{stat.userEmail}</div>
+                          </td>
+                          <td className="p-4">{stat.contact}</td>
+                          <td className="p-4 text-blue-400 font-bold">{watchedCount} / {selectedWorkshop.lectures?.length}</td>
+                          <td className="p-4">
+                            {stat.completed ? (
+                              <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-bold uppercase">Completed</span>
+                            ) : (
+                              <span className="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs font-bold uppercase">In Progress</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {workshopStats.length === 0 && (
+                      <tr><td colSpan="4" className="p-8 text-center text-gray-500">No students registered yet.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </motion.div>
         )}
       </div>
     </div>
