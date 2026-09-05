@@ -153,67 +153,11 @@ export default function WorkshopRegistration({ params }) {
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             ) : (
-              "Register & Join WhatsApp"
+              "Register and Start the workshop"
             )}
           </button>
         </form>
-
-        <button
-          type="button"
-          onClick={() => setIsPlanOpen(true)}
-          className="w-full bg-brand-green/10 text-brand-green font-bold py-2 rounded-lg hover:bg-brand-green/20 transition-all border border-brand-green/30 text-xs sm:text-sm mt-3"
-        >
-          TimeLine Of work shop
-        </button>
       </div>
-
-      {/* Plan Modal */}
-      {isPlanOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-navy/60 backdrop-blur-sm transition-opacity">
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-5 sm:p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
-            <button
-              onClick={() => setIsPlanOpen(false)}
-              className="absolute top-4 right-4 text-brand-navy/60 hover:text-brand-navy transition-colors bg-brand-navy/5 p-2 rounded-full"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            
-            <h3 className="text-xl sm:text-2xl font-bold text-brand-navy mb-6 pr-8">
-              7 Days Full Stack Workshop Timeline
-            </h3>
-            
-            <div className="space-y-4">
-              {[
-                { title: "The Building Blocks (HTML, CSS, & JS)", topics: "DOM, Flexbox, JS essentials", project: "Static Profile Card with Dark Mode" },
-                { title: "React Fundamentals", topics: "JSX, Components, Props, State (useState)", project: "Project 1 (Portfolio) - UI Shell" },
-                { title: "Advanced React & APIs", topics: "useEffect hook, Fetching Data, React Router", project: "Project 1 (Portfolio) - API Integration" },
-                { title: "Backend Basics (Node.js & Express)", topics: "Node.js, Express server, Routes (GET, POST)", project: "Project 2 (Task Master) - Express Server" },
-                { title: "Frontend meets Backend", topics: "CORS, Fetch requests, Async data loading", project: "Project 2 (Task Master) - API Connection" },
-                { title: "Databases (MongoDB)", topics: "NoSQL, MongoDB Atlas, Mongoose schemas", project: "Project 2 (Task Master) - Full CRUD" },
-                { title: "Deployment & Wrap Up", topics: "Render/Vercel deployment, GitHub READMEs", project: "Deploy both projects & Resume Polish" }
-              ].map((item, index) => (
-                <div key={index} className="flex gap-4 p-4 rounded-xl border border-brand-navy/10 bg-brand-navy/[0.02] hover:bg-brand-navy/[0.04] transition-colors">
-                  <div className="flex-shrink-0 w-14 h-14 bg-brand-green/20 text-brand-green rounded-lg flex flex-col items-center justify-center font-bold">
-                    <span className="text-xs opacity-80">DAY</span>
-                    <span className="text-lg">{index + 1}</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-brand-navy text-sm sm:text-base">{item.title}</h4>
-                    <p className="text-xs sm:text-sm text-brand-navy/70 mt-1">
-                      <span className="font-semibold">Topics:</span> {item.topics}
-                    </p>
-                    <p className="text-xs sm:text-sm text-brand-green mt-1">
-                      <span className="font-semibold text-brand-green/80">Project:</span> {item.project}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

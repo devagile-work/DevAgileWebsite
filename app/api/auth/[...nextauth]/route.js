@@ -88,6 +88,20 @@ export const authOptions = {
   },
 };
 
-const handler = NextAuth(authOptions);
+import rateLimit from "@/lib/rateLimit";
 
-export { handler as GET, handler as POST };
+const nextAuthHandler = NextAuth(authOptions);
+
+export async function POST(req, ctx) {
+  const ip = req.headers.get("x-forwarded-for") || req.ip || "127.0.0.1";
+  // 10 requests per minute for auth endpoints
+  if (!rateLimit(ip, 10, 60000)) {
+    return new Response(JSON.stringify({ error: "Too many requests, please try again later." }), { 
+       status: 429, 
+       headers: { "Content-Type": "application/json" }
+    });
+  }
+  return nextAuthHandler(req, ctx);
+}
+
+export { nextAuthHandler as GET };

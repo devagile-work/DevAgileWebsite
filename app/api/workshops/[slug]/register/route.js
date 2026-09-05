@@ -4,9 +4,15 @@ import WorkshopRegistration from "@/models/WorkshopRegistration";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
+import rateLimit from "@/lib/rateLimit";
 
 export async function POST(req, { params }) {
   try {
+    const ip = req.headers.get("x-forwarded-for") || req.ip || "127.0.0.1";
+    if (!rateLimit(ip, 5, 60000)) { // 5 requests per minute
+      return NextResponse.json({ error: "Too many requests, please try again later." }, { status: 429 });
+    }
+
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
