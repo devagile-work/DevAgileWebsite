@@ -32,7 +32,7 @@ export default async function WorkshopPage({ params }) {
       _id: l._id.toString(),
       quiz: l.quiz?.map(q => ({
         ...q,
-        _id: q._id.toString(),
+        ...(q._id ? { _id: q._id.toString() } : {}),
       })) || []
     }))
   };
