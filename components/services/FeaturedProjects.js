@@ -9,6 +9,11 @@ export default function FeaturedProjects() {
       name: "The Voice Of Glacier Foundation",
       url: "https://thevoiceofglaciers.org/",
       image: "/projects/thevoiceofglaciers.png",
+    },
+    {
+      name: "Kalyani Industries",
+      url: "https://kalyanisafety.com/",
+      image: "/projects/KalyaniSystems.png",
     }
   ];
 
@@ -18,7 +23,7 @@ export default function FeaturedProjects() {
       {/* Subtle Background Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(89,202,147,0.05),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(3,48,87,0.05),transparent_50%)] z-0" />
 
-      <div className="max-w-3xl mx-auto relative z-10 overflow-hidden w-full px-8 md:px-12 lg:px-16">
+      <div className="max-w-6xl mx-auto relative z-10 overflow-hidden w-full px-6 md:px-10 lg:px-12">
         
         {/* Section Heading */}
         <div className="text-center max-w-2xl mx-auto mb-8 lg:mb-10 space-y-2">
@@ -28,7 +33,7 @@ export default function FeaturedProjects() {
           <div className="h-1 w-20 bg-brand-navy mx-auto rounded-full" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 w-full">
           {projects.map((project, index) => (
             <a 
               key={index}

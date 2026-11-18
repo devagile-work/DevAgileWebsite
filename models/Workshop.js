@@ -18,7 +18,9 @@ const WorkshopSchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true },
     description: { type: String, required: true },
     image: { type: String, required: true },
-    lectures: [LectureSchema]
+    lectures: [LectureSchema],
+    certificateWorkshopName: { type: String },
+    certificateDuration: { type: String }
   },
   { timestamps: true }
 );

@@ -15,7 +15,10 @@ const WorkshopRegistrationSchema = new mongoose.Schema(
     contact: { type: String, required: true },
     expectations: { type: String },
     progress: [ProgressSchema],
-    completed: { type: Boolean, default: false }
+    completed: { type: Boolean, default: false },
+    certificateType: { type: String, enum: ['COMPLETION', 'PARTICIPATION', 'NONE'], default: 'NONE' },
+    certificateGeneratedAt: { type: Date },
+    certificateSentAt: { type: Date }
   },
   { timestamps: true }
 );

@@ -19,6 +19,9 @@ export default function AdminPanel() {
   const [lectureForm, setLectureForm] = useState({ title: "", youtubeVideoId: "", quiz: [] });
   const [editingLectureIdx, setEditingLectureIdx] = useState(null);
   const [workshopStats, setWorkshopStats] = useState([]);
+  const [certWorkshopName, setCertWorkshopName] = useState("");
+  const [certDuration, setCertDuration] = useState("");
+  const [selectedRegIds, setSelectedRegIds] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -81,6 +84,96 @@ export default function AdminPanel() {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const publishCertificates = async (regIds = null) => {
+    if (!selectedWorkshop) return;
+    
+    // If regIds is empty array, it means user clicked Publish Selected but nothing is selected
+    if (regIds && regIds.length === 0) return;
+
+    if (!confirm(`Are you sure you want to publish certificates for ${regIds ? regIds.length : 'all eligible'} student(s)?`)) return;
+
+    setLoading(true); setError("");
+    try {
+      const res = await fetch(`/api/admin/workshops/${selectedWorkshop._id}/certificates/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ 
+          certWorkshopName, 
+          certDuration,
+          regIds // if null, backend handles all
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        fetchWorkshopStats(selectedWorkshop._id); // Refresh stats
+      } else {
+        throw new Error(data.error || "Failed to publish certificates");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const viewPdf = async (regId) => {
+    setLoading(true); setError("");
+    try {
+      const params = new URLSearchParams({ regId });
+      if (certWorkshopName) params.append('wName', certWorkshopName);
+      if (certDuration) params.append('duration', certDuration);
+      
+      const res = await fetch(`/api/admin/workshops/${selectedWorkshop._id}/certificates/download?${params.toString()}`, {
+        headers: { "x-admin-password": password }
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      } else {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to load PDF");
+      }
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const sendCertificateEmails = async (regIds) => {
+    if (!selectedWorkshop || regIds.length === 0) return;
+    if (!confirm(`Are you sure you want to send emails to ${regIds.length} student(s)?`)) return;
+    setLoading(true); setError("");
+    try {
+      const res = await fetch(`/api/admin/workshops/${selectedWorkshop._id}/certificates/email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ 
+          regIds,
+          certWorkshopName,
+          certDuration
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        if (data.sentCount === 0 && data.errors && data.errors.length > 0) {
+          alert(`Failed to send emails. Error: ${data.errors[0].error}`);
+        } else {
+          alert(data.message);
+        }
+        fetchWorkshopStats(selectedWorkshop._id);
+      } else {
+        throw new Error(data.error || "Failed to send emails");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -859,37 +952,132 @@ export default function AdminPanel() {
                 </form>
               </div>
 
-              {/* Student Stats */}
-              <div className="flex justify-between items-center mb-6 mt-8 pt-8 border-t border-white/10">
-                <h3 className="text-xl font-bold text-white">Student Progress</h3>
+              {/* Student Stats & Certificates */}
+              <div className="flex justify-between items-end mb-6 mt-8 pt-8 border-t border-white/10">
+                <h3 className="text-xl font-bold text-white mb-2">Student Progress & Certificates</h3>
+                <div className="flex gap-4">
+                  <div className="flex flex-col">
+                    <label className="text-[10px] text-gray-400 uppercase font-bold mb-1">Workshop Name on Certificate</label>
+                    <input 
+                      type="text" 
+                      placeholder={selectedWorkshop.title} 
+                      value={certWorkshopName} 
+                      onChange={e => setCertWorkshopName(e.target.value)} 
+                      className="p-2 rounded-lg bg-black/50 border border-white/10 focus:border-purple-500 outline-none text-sm w-64" 
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-[10px] text-gray-400 uppercase font-bold mb-1">Duration (e.g. 14-21 Sept)</label>
+                    <input 
+                      type="text" 
+                      placeholder="Leave blank for none" 
+                      value={certDuration} 
+                      onChange={e => setCertDuration(e.target.value)} 
+                      className="p-2 rounded-lg bg-black/50 border border-white/10 focus:border-purple-500 outline-none text-sm w-48" 
+                    />
+                  </div>
+                </div>
               </div>
+              
+              <div className="flex gap-2 mb-4">
+                <button onClick={() => publishCertificates(null)} className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded text-sm transition-colors">
+                  Publish All Eligible
+                </button>
+                <button onClick={() => publishCertificates(selectedRegIds)} disabled={selectedRegIds.length === 0} className="px-3 py-1.5 bg-purple-600/50 hover:bg-purple-500 disabled:opacity-50 text-white rounded text-sm transition-colors">
+                  Publish Selected
+                </button>
+                <button onClick={() => sendCertificateEmails(workshopStats.filter(s => s.certificateType && s.certificateType !== 'NONE').map(s => s._id))} className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-sm transition-colors ml-4">
+                  Email All Published
+                </button>
+                <button onClick={() => sendCertificateEmails(selectedRegIds)} disabled={selectedRegIds.length === 0} className="px-3 py-1.5 bg-blue-600/50 hover:bg-blue-500 disabled:opacity-50 text-white rounded text-sm transition-colors">
+                  Email Selected
+                </button>
+              </div>
+
               <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
                     <tr className="bg-white/10 border-b border-white/10 text-xs uppercase tracking-wider text-gray-300 font-bold">
+                      <th className="p-4 w-10">
+                        <input 
+                          type="checkbox" 
+                          checked={selectedRegIds.length > 0 && selectedRegIds.length === workshopStats.length}
+                          onChange={(e) => setSelectedRegIds(e.target.checked ? workshopStats.map(s => s._id) : [])}
+                        />
+                      </th>
                       <th className="p-4">Student</th>
-                      <th className="p-4">Contact</th>
-                      <th className="p-4">Lectures Watched</th>
+                      <th className="p-4">Progress</th>
                       <th className="p-4">Status</th>
+                      <th className="p-4 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10 text-gray-300">
                     {workshopStats.map(stat => {
-                      const watchedCount = stat.progress.filter(p => p.watched).length;
+                      const watchedCount = stat.progress?.filter(p => p.watched).length || 0;
+                      const passedCount = stat.progress?.filter(p => p.quizPassed).length || 0;
+                      const totalLectures = selectedWorkshop.lectures?.length || 0;
+                      
+                      const isPublished = stat.certificateType && stat.certificateType !== 'NONE';
+                      
                       return (
                         <tr key={stat._id} className="hover:bg-white/5 transition-colors">
+                          <td className="p-4">
+                            <input 
+                              type="checkbox"
+                              checked={selectedRegIds.includes(stat._id)}
+                              onChange={(e) => setSelectedRegIds(prev => e.target.checked ? [...prev, stat._id] : prev.filter(id => id !== stat._id))}
+                            />
+                          </td>
                           <td className="p-4">
                             <div className="font-bold text-white">{stat.name}</div>
                             <div className="text-xs text-gray-500">{stat.userEmail}</div>
                           </td>
-                          <td className="p-4">{stat.contact}</td>
-                          <td className="p-4 text-blue-400 font-bold">{watchedCount} / {selectedWorkshop.lectures?.length}</td>
+                          <td className="p-4 text-xs">
+                            <span className="text-blue-400 font-bold">{watchedCount}/{totalLectures} watched</span><br/>
+                            <span className="text-green-400 font-bold">{passedCount} quizzes passed</span>
+                          </td>
                           <td className="p-4">
-                            {stat.completed ? (
-                              <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-bold uppercase">Completed</span>
+                            {isPublished ? (
+                              <div className="flex flex-col gap-1">
+                                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase w-max ${stat.certificateType === 'COMPLETION' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                                  {stat.certificateType}
+                                </span>
+                                {stat.certificateSentAt ? (
+                                  <span className="text-green-500 text-[10px]">Email Sent: {new Date(stat.certificateSentAt).toLocaleDateString()}</span>
+                                ) : (
+                                  <span className="text-yellow-500 text-[10px]">Email Not Sent</span>
+                                )}
+                              </div>
                             ) : (
-                              <span className="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs font-bold uppercase">In Progress</span>
+                              <span className="text-gray-500 text-xs italic">Not Published</span>
                             )}
+                          </td>
+                          <td className="p-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {!isPublished ? (
+                                <button 
+                                  onClick={() => publishCertificates([stat._id])}
+                                  className="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/40 text-purple-400 border border-purple-500/30 text-xs rounded transition-colors"
+                                >
+                                  Publish
+                                </button>
+                              ) : (
+                                <>
+                                  <button 
+                                    onClick={() => viewPdf(stat._id)}
+                                    className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
+                                  >
+                                    View PDF
+                                  </button>
+                                  <button 
+                                    onClick={() => sendCertificateEmails([stat._id])}
+                                    className="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 border border-indigo-500/30 text-xs rounded transition-colors"
+                                  >
+                                    Email
+                                  </button>
+                                </>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
