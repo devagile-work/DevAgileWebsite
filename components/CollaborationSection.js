@@ -2,11 +2,39 @@
 
 import { useState } from "react";
 
+const WHATSAPP_CONTACT = "918168365726";
+
+const sendToWhatsApp = (message) => {
+  const url = `https://wa.me/${WHATSAPP_CONTACT}?text=${encodeURIComponent(message)}`;
+  if (typeof window !== "undefined") {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+  return url;
+};
+
 const ServicesForm = ({ setSuccess }) => {
   const handleSubmit = (e) => {
     const form = e.target;
+    const formData = new FormData(form);
+
+    const name = formData.get("entry.213925320") || form.elements["entry.213925320"]?.value || "";
+    const email = formData.get("entry.993404023") || form.elements["entry.993404023"]?.value || "";
+    const phone = formData.get("entry.1580135531") || form.elements["entry.1580135531"]?.value || "";
+    const service = formData.get("entry.1665116935") || form.elements["entry.1665116935"]?.value || "";
+    const details = formData.get("entry.64802844") || form.elements["entry.64802844"]?.value || "";
+
+    const message = `*New Service Inquiry - DevAgile*
+*Name:* ${name}
+*Email:* ${email}
+*Phone:* ${phone}
+*Service:* ${service}
+*Project Details:*
+${details}`;
+
+    const whatsappUrl = sendToWhatsApp(message);
+
     setTimeout(() => {
-      setSuccess(true);
+      setSuccess(true, whatsappUrl);
       form.reset();
     }, 1000);
   };
@@ -59,8 +87,29 @@ const ServicesForm = ({ setSuccess }) => {
 const InstructorForm = ({ setSuccess }) => {
   const handleSubmit = (e) => {
     const form = e.target;
+    const formData = new FormData(form);
+
+    const name = formData.get("entry.2068013820") || form.elements["entry.2068013820"]?.value || "";
+    const company = formData.get("entry.831415371") || form.elements["entry.831415371"]?.value || "";
+    const email = formData.get("entry.813993315") || form.elements["entry.813993315"]?.value || "";
+    const social = formData.get("entry.1867667808") || form.elements["entry.1867667808"]?.value || "";
+    const motivation = formData.get("entry.136575172") || form.elements["entry.136575172"]?.value || "";
+    const expertise = formData.get("entry.254838391") || form.elements["entry.254838391"]?.value || "";
+
+    const message = `*New Instructor Application - DevAgile*
+*Name:* ${name}
+*Company / College:* ${company}
+*Email:* ${email}
+*Social Links:* ${social}
+*Motivation:*
+${motivation}
+*Expertise:*
+${expertise}`;
+
+    const whatsappUrl = sendToWhatsApp(message);
+
     setTimeout(() => {
-      setSuccess(true);
+      setSuccess(true, whatsappUrl);
       form.reset();
     }, 1000);
   };
@@ -111,8 +160,25 @@ const InstructorForm = ({ setSuccess }) => {
 const SponsorshipForm = ({ setSuccess }) => {
   const handleSubmit = (e) => {
     const form = e.target;
+    const formData = new FormData(form);
+
+    const name = formData.get("entry.607383054") || form.elements["entry.607383054"]?.value || "";
+    const phone = formData.get("entry.1820425821") || form.elements["entry.1820425821"]?.value || "";
+    const college = formData.get("entry.1513788118") || form.elements["entry.1513788118"]?.value || "";
+    const club = formData.get("entry.715980093") || form.elements["entry.715980093"]?.value || "";
+    const social = formData.get("entry.1494519") || form.elements["entry.1494519"]?.value || "N/A";
+
+    const message = `*New Sponsorship Request - DevAgile*
+*Name:* ${name}
+*Phone:* ${phone}
+*College:* ${college}
+*Tech Club / Community:* ${club}
+*Social Links:* ${social}`;
+
+    const whatsappUrl = sendToWhatsApp(message);
+
     setTimeout(() => {
-      setSuccess(true);
+      setSuccess(true, whatsappUrl);
       form.reset();
     }, 1000);
   };
@@ -157,8 +223,34 @@ const SponsorshipForm = ({ setSuccess }) => {
 const InternshipForm = ({ setSuccess }) => {
   const handleSubmit = (e) => {
     const form = e.target;
+    const formData = new FormData(form);
+
+    const name = formData.get("entry.1292295594") || form.elements["entry.1292295594"]?.value || "";
+    const phone = formData.get("entry.342267939") || form.elements["entry.342267939"]?.value || "";
+    const domain = formData.get("entry.2113682125") || form.elements["entry.2113682125"]?.value || "";
+    const resume = formData.get("entry.748003001") || form.elements["entry.748003001"]?.value || "";
+    const college = formData.get("entry.1762558419") || form.elements["entry.1762558419"]?.value || "";
+    const rollNo = formData.get("entry.603132079") || form.elements["entry.603132079"]?.value || "";
+    const cgpa = formData.get("entry.1619279295") || form.elements["entry.1619279295"]?.value || "";
+    const accolades = formData.get("entry.784677904") || form.elements["entry.784677904"]?.value || "N/A";
+    const whyFit = formData.get("entry.2005667376") || form.elements["entry.2005667376"]?.value || "";
+
+    const message = `*New Internship Application - DevAgile*
+*Name:* ${name}
+*Contact Number:* ${phone}
+*Domain:* ${domain}
+*Resume Link:* ${resume}
+*College Name:* ${college}
+*Roll / Reg Number:* ${rollNo}
+*CGPA:* ${cgpa}
+*Accolades / Achievements:* ${accolades}
+*Why Best Fit:*
+${whyFit}`;
+
+    const whatsappUrl = sendToWhatsApp(message);
+
     setTimeout(() => {
-      setSuccess(true);
+      setSuccess(true, whatsappUrl);
       form.reset();
     }, 1000);
   };
@@ -232,6 +324,7 @@ const InternshipForm = ({ setSuccess }) => {
 export default function CollaborationSection() {
   const [activeForm, setActiveForm] = useState("services");
   const [successState, setSuccessState] = useState({ services: false, instructor: false, sponsorship: false, internship: false });
+  const [whatsAppUrls, setWhatsAppUrls] = useState({ services: "", instructor: "", sponsorship: "", internship: "" });
 
   const getInvolvedTypes = [
     {
@@ -263,12 +356,18 @@ export default function CollaborationSection() {
   const activeFormObj = getInvolvedTypes.find((t) => t.id === activeForm);
   const ActiveFormComponent = activeFormObj.Form;
 
-  const handleSetSuccess = (status) => {
+  const handleSetSuccess = (status, whatsappUrl = "") => {
     setSuccessState((prev) => ({ ...prev, [activeForm]: status }));
+    if (whatsappUrl) {
+      setWhatsAppUrls((prev) => ({ ...prev, [activeForm]: whatsappUrl }));
+    }
   };
 
   return (
     <section id="collaboration" className="min-h-screen w-full flex flex-col justify-center bg-slate-50 relative overflow-hidden py-16 sm:py-24">
+      {/* Anchor for contact us section */}
+      <div id="contact" className="absolute -top-12 left-0 pointer-events-none" />
+
       {/* Background shape */}
       <div className="absolute top-[10%] left-[-15%] w-[450px] h-[450px] rounded-full bg-brand-green/10 blur-[120px] z-0 animate-pulse-glow" />
 
@@ -374,6 +473,19 @@ export default function CollaborationSection() {
                     <p className="font-roboto font-light text-brand-navy/60 text-[11px] px-6 max-w-sm">
                       Thanks for reaching out! We have received your response and will review it soon.
                     </p>
+                    {whatsAppUrls[activeForm] && (
+                      <a
+                        href={whatsAppUrls[activeForm]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 font-roboto text-xs font-bold bg-[#25D366] text-white px-3.5 py-1.5 rounded-md hover:bg-[#1ebd59] transition-all shadow-sm"
+                      >
+                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+                        </svg>
+                        <span>Chat on WhatsApp</span>
+                      </a>
+                    )}
                     <button
                       onClick={() => handleSetSuccess(false)}
                       className="mt-3 font-roboto text-[11px] font-bold text-brand-navy hover:text-brand-green transition-colors underline"
